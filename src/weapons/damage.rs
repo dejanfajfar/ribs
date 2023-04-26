@@ -76,3 +76,58 @@ impl Display for Damage {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn apply_damage_already_at_maximum(){
+        let mut damage = Hit{slashing: f32::MAX, piercing: f32::MAX};
+
+        damage.apply_damage(DamageType::Slashing, 1.0);
+
+        assert_eq!(f32::MAX, damage.slashing);
+    }
+
+    #[test]
+    fn apply_damage_damage_added(){
+        let mut damage = Hit{slashing: 2.0, piercing: 2.0};
+
+        damage.apply_damage(DamageType::Slashing, 1.0);
+
+        assert_eq!(3.0, damage.slashing);
+
+        damage.apply_damage(DamageType::Piercing, 1.0);
+
+        assert_eq!(3.0, damage.slashing);
+    }
+
+    #[test]
+    fn damage_add_miss_miss(){
+        let result = Damage::Miss + Damage::Miss;
+
+        assert_eq!(result, Damage::Miss);
+    }
+
+    #[test]
+    fn damage_add_miss_hit(){
+        let result = Damage::Miss +  Damage::Hit(Hit{piercing: 1.0, slashing: 1.0});
+
+        assert_eq!(result, Damage::Hit(Hit{piercing: 1.0, slashing: 1.0}));
+    }
+
+    #[test]
+    fn damage_add_hit_miss(){
+        let result = Damage::Hit(Hit{piercing: 1.0, slashing: 1.0}) + Damage::Miss;
+
+        assert_eq!(result, Damage::Hit(Hit{piercing: 1.0, slashing: 1.0}));
+    }
+
+    #[test]
+    fn damage_add_hit_hit(){
+        let result = Damage::Hit(Hit{piercing: 1.0, slashing: 1.0}) +  Damage::Hit(Hit{piercing: 1.0, slashing: 1.0});
+
+        assert_eq!(result, Damage::Hit(Hit{piercing: 2.0, slashing: 2.0}));
+    }
+}
