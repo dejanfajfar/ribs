@@ -14,10 +14,6 @@ impl Skills {
         return new_skill;
     }
 
-    pub fn max() -> Self {
-        return Skills { strength: 10, dexterity: 10 }
-    }
-
     pub fn random() -> Self {
         let mut rng = thread_rng();
         return Skills::new(rng.gen_range(0..=10), rng.gen_range(0..=10))
