@@ -56,10 +56,9 @@ impl DmgCalculator for Gun {
         }
 
         // The damage is not
-        let damage: f32 = self.stats.hit_damage(None) * self.normalized_rate_of_fire() as f32;
+        let damage: f32 = self.stats.hit_damage() * self.normalized_rate_of_fire() as f32;
 
-        let mut calculated_damage = Hit::default();
-        calculated_damage.apply_damage(self.stats.damage_type, damage);
+        let calculated_damage: Hit = Hit::new(self.stats.damage_type, damage);
 
         // Firing a gun uses one bullet in the magazine.
         self.shots_remaining -= 1;

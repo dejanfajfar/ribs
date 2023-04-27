@@ -18,7 +18,7 @@ pub trait DmgCalculator {
     fn attack(&mut self, player_skills: Skills) -> Damage;
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct BaseWeaponAttributes {
     pub name: String,
     pub base_damage: u16,
@@ -27,7 +27,7 @@ pub struct BaseWeaponAttributes {
 }
 
 impl BaseWeaponAttributes {
-    pub fn hit_damage(&self, player_skills: Option<Skills>) -> f32 {
+    pub fn hit_damage(&self) -> f32 {
         let mut rng = thread_rng();
         let damage = f32::from(self.base_damage) * rng.gen_range(0.875..1.125);
         return damage.ceil();
