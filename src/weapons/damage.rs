@@ -1,5 +1,4 @@
 use std::{
-    default,
     fmt::{Display, Formatter, Result},
     ops::Add,
 };
@@ -18,7 +17,7 @@ pub enum Damage {
     Miss,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 pub struct Hit {
     pub piercing: f32,
     pub slashing: f32,
@@ -31,14 +30,11 @@ impl Hit {
             DamageType::Slashing => self.slashing += damage_value,
         }
     }
-}
 
-impl Default for Hit {
-    fn default() -> Self {
-        Self {
-            piercing: 0.0,
-            slashing: 0.0,
-        }
+    pub fn new(damage_type: DamageType, damage_value: f32) -> Self {
+        let mut ret_val = Hit::default();
+        ret_val.apply_damage(damage_type, damage_value);
+        return ret_val;
     }
 }
 
