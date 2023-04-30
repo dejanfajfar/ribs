@@ -3,7 +3,11 @@ use std::{
     ops::Add,
 };
 
-#[derive(Default, Debug, Copy, Clone)]
+pub mod hit;
+
+use crate::hit::*;
+
+#[derive(Default, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum DamageType {
     #[default]
     Piercing,
@@ -15,27 +19,6 @@ pub enum Damage {
     Hit(Hit),
     #[default]
     Miss,
-}
-
-#[derive(Debug, PartialEq, Default)]
-pub struct Hit {
-    pub piercing: f32,
-    pub slashing: f32,
-}
-
-impl Hit {
-    pub fn apply_damage(&mut self, damage_type: DamageType, damage_value: f32) {
-        match damage_type {
-            DamageType::Piercing => self.piercing += damage_value,
-            DamageType::Slashing => self.slashing += damage_value,
-        }
-    }
-
-    pub fn new(damage_type: DamageType, damage_value: f32) -> Self {
-        let mut ret_val = Hit::default();
-        ret_val.apply_damage(damage_type, damage_value);
-        return ret_val;
-    }
 }
 
 impl Add for Damage {
@@ -78,8 +61,11 @@ mod test {
     use super::*;
 
     #[test]
-    fn apply_damage_already_at_maximum(){
-        let mut damage = Hit{slashing: f32::MAX, piercing: f32::MAX};
+    fn apply_damage_already_at_maximum() {
+        let mut damage = Hit {
+            slashing: f32::MAX,
+            piercing: f32::MAX,
+        };
 
         damage.apply_damage(DamageType::Slashing, 1.0);
 
@@ -87,8 +73,11 @@ mod test {
     }
 
     #[test]
-    fn apply_damage_damage_added(){
-        let mut damage = Hit{slashing: 2.0, piercing: 2.0};
+    fn apply_damage_damage_added() {
+        let mut damage = Hit {
+            slashing: 2.0,
+            piercing: 2.0,
+        };
 
         damage.apply_damage(DamageType::Slashing, 1.0);
 
@@ -100,30 +89,61 @@ mod test {
     }
 
     #[test]
-    fn damage_add_miss_miss(){
+    fn damage_add_miss_miss() {
         let result = Damage::Miss + Damage::Miss;
 
         assert_eq!(result, Damage::Miss);
     }
 
     #[test]
-    fn damage_add_miss_hit(){
-        let result = Damage::Miss +  Damage::Hit(Hit{piercing: 1.0, slashing: 1.0});
+    fn damage_add_miss_hit() {
+        let result = Damage::Miss
+            + Damage::Hit(Hit {
+                piercing: 1.0,
+                slashing: 1.0,
+            });
 
-        assert_eq!(result, Damage::Hit(Hit{piercing: 1.0, slashing: 1.0}));
+        assert_eq!(
+            result,
+            Damage::Hit(Hit {
+                piercing: 1.0,
+                slashing: 1.0
+            })
+        );
     }
 
     #[test]
-    fn damage_add_hit_miss(){
-        let result = Damage::Hit(Hit{piercing: 1.0, slashing: 1.0}) + Damage::Miss;
+    fn damage_add_hit_miss() {
+        let result = Damage::Hit(Hit {
+            piercing: 1.0,
+            slashing: 1.0,
+        }) + Damage::Miss;
 
-        assert_eq!(result, Damage::Hit(Hit{piercing: 1.0, slashing: 1.0}));
+        assert_eq!(
+            result,
+            Damage::Hit(Hit {
+                piercing: 1.0,
+                slashing: 1.0
+            })
+        );
     }
 
     #[test]
-    fn damage_add_hit_hit(){
-        let result = Damage::Hit(Hit{piercing: 1.0, slashing: 1.0}) +  Damage::Hit(Hit{piercing: 1.0, slashing: 1.0});
+    fn damage_add_hit_hit() {
+        let result = Damage::Hit(Hit {
+            piercing: 1.0,
+            slashing: 1.0,
+        }) + Damage::Hit(Hit {
+            piercing: 1.0,
+            slashing: 1.0,
+        });
 
-        assert_eq!(result, Damage::Hit(Hit{piercing: 2.0, slashing: 2.0}));
+        assert_eq!(
+            result,
+            Damage::Hit(Hit {
+                piercing: 2.0,
+                slashing: 2.0
+            })
+        );
     }
 }

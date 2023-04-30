@@ -1,6 +1,8 @@
 use std::fmt::{Display, Formatter, Result};
 
-use super::super::skills::*;
+use crate::damage::hit::*;
+use crate::damage::*;
+use crate::skills::*;
 use crate::weapons::*;
 
 #[derive(Debug, Default)]
@@ -88,6 +90,7 @@ impl GunFactory {
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
     use approx::assert_relative_eq;
 
@@ -97,7 +100,7 @@ mod tests {
     fn test_calculate_hit_damage() {
         let mut test_gun: Gun = GUN_FACTORY.m_10af_lexington();
 
-        let test_damage = test_gun.attack(Skills::max());
+        let test_damage = test_gun.attack(MAX_SKILLS);
 
         match test_damage {
             Damage::Hit(h) => assert_relative_eq!(

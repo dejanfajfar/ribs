@@ -1,11 +1,10 @@
-pub mod damage;
 pub mod guns;
 
-use crate::damage::*;
 use crate::guns::Gun;
 use rand::{thread_rng, Rng};
 
-use super::skills::*;
+use crate::damage::*;
+use crate::skills::*;
 
 #[derive(Debug, Default)]
 pub enum Weapon {

@@ -1,7 +1,12 @@
-use crate::weapons::{damage::Damage, DmgCalculator, Weapon};
+use crate::damage::*;
+use crate::skills::*;
+use crate::weapons::{DmgCalculator, Weapon};
 
-use super::skills::*;
 use std::fmt::{Display, Formatter, Result};
+
+pub mod armor;
+
+use armor::*;
 
 #[derive(Debug, Default)]
 pub struct Player {
@@ -9,6 +14,7 @@ pub struct Player {
     skills: Skills,
     hit_points: u16,
     weapon: Weapon,
+    armor: Option<Armor>,
 }
 
 impl Player {
@@ -18,31 +24,53 @@ impl Player {
             skills,
             hit_points,
             weapon: Weapon::None,
+            armor: None,
         }
     }
 
     pub fn apply_damage(&mut self, damage: Damage) -> (u16, u16) {
         match damage {
             Damage::Miss => (0, self.hit_points),
-            Damage::Hit(h) => {
-                let combined_damage: u16 = (h.piercing + h.slashing).floor() as u16;
+            Damage::Hit(_h) => {
+                let reduced_damage = self.reduce_damage(damage);
+                match reduced_damage {
+                    Damage::Miss => (0, self.hit_points),
+                    Damage::Hit(h) => {
+                        let combined_damage: u16 = (h.piercing + h.slashing).floor() as u16;
 
-                if self.hit_points <= combined_damage {
-                    self.hit_points = 0;
-                    return (combined_damage, 0);
-                } else {
-                    self.hit_points = self.hit_points - combined_damage;
-                    return (combined_damage, self.hit_points);
+                        if self.hit_points <= combined_damage {
+                            self.hit_points = 0;
+                            return (combined_damage, 0);
+                        } else {
+                            self.hit_points = self.hit_points - combined_damage;
+                            return (combined_damage, self.hit_points);
+                        }
+                    }
                 }
             }
         }
     }
 
+    fn reduce_damage(&self, damage: Damage) -> Damage {
+        match &self.armor {
+            None => return damage,
+            Some(a) => return a.calculate_reduction(&damage),
+        };
+    }
+
+    pub fn name(&self) -> String {
+        return self.name.to_string();
+    }
+
     pub fn add_weapon(self, weapon: Weapon) -> Self {
-        Self { 
-            weapon,
+        Self { weapon, ..self }
+    }
+
+    pub fn add_armor(self, armor: Armor) -> Self {
+        return Self {
+            armor: Some(armor),
             ..self
-        }
+        };
     }
 
     pub fn weapon_mut(&mut self) -> &mut Weapon {
@@ -62,7 +90,7 @@ impl Player {
                     g.reload();
                 }
                 g.attack(player_skills)
-            },
+            }
         }
     }
 }

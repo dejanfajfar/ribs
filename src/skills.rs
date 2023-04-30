@@ -6,6 +6,11 @@ pub struct Skills {
     dexterity: u8,
 }
 
+pub const MAX_SKILLS: Skills = Skills {
+    dexterity: 10,
+    strength: 10,
+};
+
 impl Skills {
     pub fn new(strength: u8, dexterity: u8) -> Self {
         let mut new_skill = Skills::default();
@@ -16,7 +21,7 @@ impl Skills {
 
     pub fn random() -> Self {
         let mut rng = thread_rng();
-        return Skills::new(rng.gen_range(0..=10), rng.gen_range(0..=10))
+        return Skills::new(rng.gen_range(1..=10), rng.gen_range(1..=10));
     }
 
     pub fn skill_check(&self, min: Option<Skills>) -> bool {
@@ -41,7 +46,7 @@ impl Skills {
                     0 => 0.5,
                     ..=-1 => 0.5 - f64::from(gap.abs()) * 0.05,
                     1..=2 => 0.5 + f64::from(gap) * 0.1,
-                    3.. => 0.6 + f64::from(gap) * 0.05
+                    3.. => 0.6 + f64::from(gap) * 0.05,
                 }
             }
         }
