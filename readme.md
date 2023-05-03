@@ -17,6 +17,10 @@ R::::::R     R:::::R .::::. I::::::::I .::::. B::::::::::::::::B   .::::. S:::::
 RRRRRRRR     RRRRRRR ...... IIIIIIIIII ...... BBBBBBBBBBBBBBBBB    ......  SSSSSSSSSSSSSSS   
 ```                                                                                          
 
+[![Rust](https://github.com/dejanfajfar/ribs/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/dejanfajfar/ribs/actions/workflows/rust.yml)
+
+
+
 > My little rust experiment
 
 https://doc.rust-lang.org/beta/style-guide/index.html
