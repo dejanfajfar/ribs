@@ -1,7 +1,7 @@
 use crate::damage::hit::*;
 use crate::damage::*;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct Armor {
     piercing: f32,
     slashing: f32,

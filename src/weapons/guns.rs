@@ -5,7 +5,7 @@ use crate::damage::*;
 use crate::skills::*;
 use crate::weapons::*;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Gun {
     stats: BaseWeaponAttributes,
     clip_size: u16,
@@ -100,7 +100,7 @@ mod tests {
     fn test_calculate_hit_damage() {
         let mut test_gun: Gun = GUN_FACTORY.m_10af_lexington();
 
-        let test_damage = test_gun.attack(MAX_SKILLS);
+        let test_damage = test_gun.attack(Skills::new(10, 10));
 
         match test_damage {
             Damage::Hit(h) => assert_relative_eq!(

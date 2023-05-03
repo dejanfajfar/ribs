@@ -2,13 +2,11 @@ use crate::damage::*;
 use crate::skills::*;
 use crate::weapons::{DmgCalculator, Weapon};
 
-use std::fmt::{Display, Formatter, Result};
-
 pub mod armor;
 
 use armor::*;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Player {
     name: String,
     skills: Skills,
@@ -59,7 +57,7 @@ impl Player {
     }
 
     pub fn name(&self) -> String {
-        return self.name.to_string();
+        return self.name.clone();
     }
 
     pub fn add_weapon(self, weapon: Weapon) -> Self {
@@ -92,12 +90,6 @@ impl Player {
                 g.attack(player_skills)
             }
         }
-    }
-}
-
-impl Display for Player {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{}", self.name)
     }
 }
 

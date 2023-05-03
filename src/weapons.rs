@@ -6,7 +6,7 @@ use rand::{thread_rng, Rng};
 use crate::damage::*;
 use crate::skills::*;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub enum Weapon {
     #[default]
     None,

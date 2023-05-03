@@ -3,54 +3,82 @@ mod player;
 mod skills;
 mod weapons;
 
+use std::collections::HashMap;
 use damage::*;
 use player::armor::*;
 use player::*;
+use rand::seq::{SliceChooseIter, SliceRandom};
 use skills::*;
 use weapons::guns::*;
 use weapons::*;
 
 fn main() {
-    let mut loop_safety: i32 = 10000;
+    let mut loop_counter: u32 = 1;
+    let max_loop_count: u32 = 10000;
 
     let gun_factory = GunFactory {};
 
-    let gun: Weapon = Weapon::Gun(gun_factory.m_10af_lexington());
-    let gun2: Weapon = Weapon::Gun(gun_factory.m_10af_lexington());
+    let player1 = Player::new("Bob".to_owned(), Skills::random(), 400)
+        .add_weapon(Weapon::Gun(gun_factory.m_10af_lexington()));
 
-    let mut player1 = Player::new("Bob".to_owned(), Skills::random(), 400).add_weapon(gun);
+    let player3 = Player::new("Carl".to_owned(), Skills::random(), 400)
+        .add_weapon(Weapon::Gun(gun_factory.m_10af_lexington()));
 
-    let mut player2 = Player::new("Dave".to_owned(), Skills::random(), 400)
-        .add_weapon(gun2)
+    let player2 = Player::new("Dave".to_owned(), Skills::random(), 400)
+        .add_weapon(Weapon::Gun(gun_factory.m_10af_lexington()))
         .add_armor(Armor::new(10.0, 5.0));
 
+    let mut players: HashMap<String, Player> = HashMap::from([
+        (player1.name(), player1),
+        (player2.name(), player2),
+        (player3.name(), player3),
+    ]);
+
     println!(
-        "| {0:<10} | {1:<10} | {2:>6} | {3:>4} |",
-        "Attacker", "Attacked", "Damage", "HP"
+        "| {0:<5} | {1:<10} | {2:<10} | {3:>6} | {4:>4} |",
+         "Round", "Attacker", "Attacked", "Damage", "HP"
     );
-    while player1.is_alive() && player2.is_alive() && loop_safety > 0 {
-        let p1_damage_output: Damage = player1.attack();
-        let p2_damage_taken: (u16, u16) = player2.apply_damage(p1_damage_output);
+    while players.iter().all(|p: (&String, &Player)| p.1.is_alive()) && loop_counter <= max_loop_count {
+        let mut live_players: Vec<String> = live_players(&players);
+        let (attacker_name, attacked_name) = choose_two(&mut live_players);
+
+        let mut attacker: Player = players.get(attacker_name).unwrap().to_owned();
+        let mut attacked: Player = players.get(attacked_name).unwrap().to_owned();
+
+        let attacker_dmg_out: Damage = attacker.attack();
+        let (attacked_dmg_taken, attacked_hp_remaining) = attacked.apply_damage(attacker_dmg_out);
+
+        players.insert(attacker.name(), attacker);
+        players.insert(attacked.name(), attacked);
 
         println!(
-            "| {0:<10} | {1:<10} | {2:>6} | {3:>4} |",
-            player1.name(),
-            player2.name(),
-            p2_damage_taken.0,
-            p2_damage_taken.1
+            "| {0:<5} | {1:<10} | {2:<10} | {3:>6} | {4:>4} |",
+            loop_counter, attacker_name, attacked_name, attacked_dmg_taken, attacked_hp_remaining
         );
 
-        let p2_damage_output: Damage = player2.attack();
-        let p1_damage_taken: (u16, u16) = player1.apply_damage(p2_damage_output);
-
-        println!(
-            "| {0:<10} | {1:<10} | {2:>6} | {3:>4} |",
-            player2.name(),
-            player1.name(),
-            p1_damage_taken.0,
-            p1_damage_taken.1
-        );
-
-        loop_safety -= 1;
+        loop_counter += 1;
     }
+}
+
+fn choose_two(players: &mut Vec<String>) -> (&String, &String) {
+    players.shuffle(&mut rand::thread_rng());
+
+    let chosen: SliceChooseIter<[String], String> =
+        players.choose_multiple(&mut rand::thread_rng(), 2);
+
+    let mut chosen_iter: SliceChooseIter<[String], String> = chosen.into_iter();
+
+    return (chosen_iter.next().unwrap(), chosen_iter.next().unwrap());
+}
+
+fn live_players(players: &HashMap<String, Player>) -> Vec<String> {
+    let mut ret_val: Vec<String> = vec![];
+
+    for (player_name, player) in players {
+        if player.is_alive() {
+            ret_val.insert(0, player_name.clone());
+        }
+    }
+
+    return ret_val;
 }

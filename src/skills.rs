@@ -6,11 +6,6 @@ pub struct Skills {
     dexterity: u8,
 }
 
-pub const MAX_SKILLS: Skills = Skills {
-    dexterity: 10,
-    strength: 10,
-};
-
 impl Skills {
     pub fn new(strength: u8, dexterity: u8) -> Self {
         let mut new_skill = Skills::default();
