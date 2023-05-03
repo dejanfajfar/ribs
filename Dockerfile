@@ -1,8 +1,48 @@
-FROM rust
+###############################################################################
+## BUILDER
+###############################################################################
+FROM rust:latest as builder
 
-WORKDIR /usr/src/ribs
-COPY . .
+# add the build targen required for alpine
+RUN rustup target add x86_64-unknown-linux-musl
+RUN apt update && apt install -y musl-tools musl-dev
+RUN update-ca-certificates
 
-RUN cargo install --path .
+WORKDIR /ribs
 
-CMD ["ribs"]
+# Create appuser
+ENV USER=ribs_user
+ENV UID=10001
+
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    "${USER}"
+
+# copy from host
+COPY ./ .
+
+# Build relase version of app 
+RUN cargo build --target x86_64-unknown-linux-musl --release
+
+
+###############################################################################
+## RUNNER
+###############################################################################
+FROM alpine
+
+WORKDIR /ribs
+
+# Import from builder
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+
+COPY --from=builder /ribs/target/x86_64-unknown-linux-musl/release/ribs ./
+
+USER ribs_user:ribs_user
+
+CMD ["/ribs/ribs"]
