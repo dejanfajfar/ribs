@@ -12,20 +12,24 @@ use skills::*;
 use weapons::guns::*;
 use weapons::*;
 
+use crate::weapons::blades::BladeFactory;
+
 fn main() {
     let mut loop_counter: u32 = 1;
     let max_loop_count: u32 = 10000;
 
-    let gun_factory = GunFactory {};
+    let gun_factory: GunFactory = GunFactory {};
+    let blade_factory: BladeFactory = BladeFactory {};
+    let skills_factory: SkillsFactory = SkillsFactory {};
 
-    let player1 = Player::new("Bob".to_owned(), Skills::random(), 400)
+    let player1 = Player::new("Bob".to_owned(), skills_factory.random(), 400)
         .add_weapon(Weapon::Gun(gun_factory.m_10af_lexington()));
 
-    let player3 = Player::new("Carl".to_owned(), Skills::random(), 400)
+    let player3 = Player::new("Carl".to_owned(), skills_factory.random(), 400)
         .add_weapon(Weapon::Gun(gun_factory.m_10af_lexington()));
 
-    let player2 = Player::new("Dave".to_owned(), Skills::random(), 400)
-        .add_weapon(Weapon::Gun(gun_factory.m_10af_lexington()))
+    let player2 = Player::new("Dave".to_owned(), skills_factory.ninja(), 400)
+        .add_weapon(Weapon::Blade(blade_factory.katana()))
         .add_armor(Armor::new(10.0, 5.0));
 
     let mut players: HashMap<String, Player> = HashMap::from([

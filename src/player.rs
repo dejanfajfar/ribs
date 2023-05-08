@@ -89,6 +89,9 @@ impl Player {
                 }
                 g.attack(player_skills)
             }
+            Weapon::Blade(b) => {
+                b.attack(player_skills)
+            }
         }
     }
 }

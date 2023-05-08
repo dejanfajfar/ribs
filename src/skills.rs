@@ -14,11 +14,6 @@ impl Skills {
         return new_skill;
     }
 
-    pub fn random() -> Self {
-        let mut rng = thread_rng();
-        return Skills::new(rng.gen_range(1..=10), rng.gen_range(1..=10));
-    }
-
     pub fn skill_check(&self, min: Option<Skills>) -> bool {
         match min {
             None => return true,
@@ -90,6 +85,19 @@ impl Skills {
 
     pub fn dexterity_mut(&mut self) -> &mut u8 {
         return Self::normalize_skill_mut(&mut self.dexterity);
+    }
+}
+
+pub struct SkillsFactory;
+
+impl SkillsFactory{
+    pub fn random(&self) -> Skills {
+        let mut rng = thread_rng();
+        return Skills::new(rng.gen_range(1..=10), rng.gen_range(1..=10));
+    }
+
+    pub fn ninja(&self) -> Skills {
+        return Skills::new(6, 9);
     }
 }
 

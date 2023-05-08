@@ -1,6 +1,8 @@
 pub mod guns;
+pub mod blades;
 
 use crate::guns::Gun;
+use crate::blades::Blade;
 use rand::{thread_rng, Rng};
 
 use crate::damage::*;
@@ -11,6 +13,7 @@ pub enum Weapon {
     #[default]
     None,
     Gun(Gun),
+    Blade(Blade)
 }
 
 pub trait DmgCalculator {
