@@ -13,7 +13,7 @@ pub struct Blade {
     min_skill: Option<Skills>
 }
 
-impl DmgCalculator for Blade {
+impl DmgDealer for Blade {
     fn attack(&mut self, player_skills: Skills) -> Damage {
         if !player_skills.skill_check(self.min_skill) {
             return Damage::Miss;
@@ -24,6 +24,10 @@ impl DmgCalculator for Blade {
         }
 
         return Damage::Hit(Hit::new(DamageType::Slashing, self.stats.hit_damage()));
+    }
+
+    fn stats(&self) -> &BaseWeaponAttributes {
+        return &self.stats;
     }
 }
 

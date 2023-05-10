@@ -32,6 +32,11 @@ fn main() {
         .add_weapon(Weapon::Blade(blade_factory.katana()))
         .add_armor(Armor::new(10.0, 5.0));
 
+
+    println!("{}", player1.pretty_print());
+    println!("{}", player2.pretty_print());
+    println!("{}", player3.pretty_print());
+
     let mut players: HashMap<String, Player> = HashMap::from([
         (player1.name(), player1),
         (player2.name(), player2),
@@ -42,8 +47,12 @@ fn main() {
         "| {0:<5} | {1:<10} | {2:<10} | {3:>6} | {4:>4} |",
          "Round", "Attacker", "Attacked", "Damage", "HP"
     );
-    while players.iter().all(|p: (&String, &Player)| p.1.is_alive()) && loop_counter <= max_loop_count {
+    while players.iter().any(|p: (&String, &Player)| p.1.is_alive()) && loop_counter <= max_loop_count {
         let mut live_players: Vec<String> = live_players(&players);
+
+        if live_players.len() == 1 {
+            break;
+        }
         let (attacker_name, attacked_name) = choose_two(&mut live_players);
 
         let mut attacker: Player = players.get(attacker_name).unwrap().to_owned();

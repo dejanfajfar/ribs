@@ -56,6 +56,15 @@ impl Display for Damage {
     }
 }
 
+impl Display for DamageType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        match self {
+            DamageType::Piercing => write!(f, "Piercing"),
+            DamageType::Slashing => write!(f, "Slashing"),
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

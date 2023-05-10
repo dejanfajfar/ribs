@@ -41,7 +41,7 @@ impl Display for Gun {
     }
 }
 
-impl DmgCalculator for Gun {
+impl DmgDealer for Gun {
     fn attack(&mut self, player_skills: Skills) -> Damage {
         // if the magazine is empty then we have an automatic miss
         if self.shots_remaining <= 0 {
@@ -66,6 +66,10 @@ impl DmgCalculator for Gun {
         self.shots_remaining -= 1;
 
         return Damage::Hit(calculated_damage);
+    }
+
+    fn stats(&self) -> &BaseWeaponAttributes {
+        return &self.stats;
     }
 }
 

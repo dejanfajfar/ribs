@@ -1,17 +1,17 @@
 use crate::damage::*;
 use crate::skills::*;
-use crate::weapons::{DmgCalculator, Weapon};
+use crate::weapons::{DmgDealer, Weapon};
 
 pub mod armor;
 
 use armor::*;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct Player {
     name: String,
     skills: Skills,
     hit_points: u16,
-    weapon: Weapon,
+    weapon: Option<Weapon>,
     armor: Option<Armor>,
 }
 
@@ -21,7 +21,7 @@ impl Player {
             name,
             skills,
             hit_points,
-            weapon: Weapon::None,
+            weapon: None,
             armor: None,
         }
     }
@@ -61,7 +61,7 @@ impl Player {
     }
 
     pub fn add_weapon(self, weapon: Weapon) -> Self {
-        Self { weapon, ..self }
+        Self { weapon: Some(weapon), ..self }
     }
 
     pub fn add_armor(self, armor: Armor) -> Self {
@@ -71,7 +71,7 @@ impl Player {
         };
     }
 
-    pub fn weapon_mut(&mut self) -> &mut Weapon {
+    pub fn weapon_mut(&mut self) -> &mut Option<Weapon> {
         return &mut self.weapon;
     }
 
@@ -82,17 +82,42 @@ impl Player {
     pub fn attack(&mut self) -> Damage {
         let player_skills: Skills = self.skills;
         match self.weapon_mut() {
-            Weapon::None => Damage::Miss,
-            Weapon::Gun(g) => {
+            None => Damage::Miss,
+            Some(Weapon::Gun(g)) => {
                 if g.is_clip_empty() {
                     g.reload();
                 }
                 g.attack(player_skills)
             }
-            Weapon::Blade(b) => {
+            Some(Weapon::Blade(b)) => {
                 b.attack(player_skills)
             }
         }
+    }
+
+    pub fn pretty_print(&self) -> String {
+        let mut print_out: String = String::from("");
+
+        print_out.push_str(format!("{:=^1$}", self.name, 40).as_str());
+        print_out.push('\n');
+        print_out.push_str(format!("HP : {}", self.hit_points).as_str());
+        print_out.push('\n');
+        print_out.push_str(format!("Strength : {0:<5} Dexterity : {1:<5}", self.skills.strength(), self.skills.dexterity()).as_str());
+        print_out.push('\n');
+        print_out.push_str(format!("{:-^1$}", "Weapon", 40).as_str());
+        print_out.push('\n');
+
+        if self.weapon.is_some(){
+            let weapon: &Weapon =  self.weapon.as_ref().ok_or("no weapon equipped").unwrap();
+            print_out.push_str(format!("Name: {}", weapon.stats().name).as_str());
+            print_out.push('\n');
+            print_out.push_str(format!("Base damage: {0:<5} Damage type : {1}", weapon.stats().base_damage, weapon.stats().damage_type).as_str());
+        }
+        else {
+            print_out.push_str("No weapon equipped");
+        }
+
+        return print_out;
     }
 }
 

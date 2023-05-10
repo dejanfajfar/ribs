@@ -8,16 +8,32 @@ use rand::{thread_rng, Rng};
 use crate::damage::*;
 use crate::skills::*;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub enum Weapon {
-    #[default]
-    None,
     Gun(Gun),
     Blade(Blade)
 }
 
-pub trait DmgCalculator {
+impl DmgDealer for Weapon {
+    fn attack(&mut self, player_skills: Skills) -> Damage {
+        match self {
+            Weapon::Gun(g) => g.attack(player_skills),
+            Weapon::Blade(b) => b.attack(player_skills),
+        }
+    }
+
+    fn stats(&self) -> &BaseWeaponAttributes {
+        match self {
+            Weapon::Gun(g) => g.stats(),
+            Weapon::Blade(b) => b.stats(),
+        }
+    }
+}
+
+pub trait DmgDealer {
     fn attack(&mut self, player_skills: Skills) -> Damage;
+
+    fn stats(&self) -> &BaseWeaponAttributes;
 }
 
 #[derive(Debug, Default, Clone)]
