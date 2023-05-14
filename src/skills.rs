@@ -1,3 +1,5 @@
+mod skillpoint;
+
 use rand::{thread_rng, Rng};
 
 #[derive(Debug, Default, Clone, Copy)]
