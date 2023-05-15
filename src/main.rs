@@ -3,12 +3,12 @@ mod player;
 mod skills;
 mod weapons;
 
-use std::collections::HashMap;
 use damage::*;
 use player::armor::*;
 use player::*;
 use rand::seq::{SliceChooseIter, SliceRandom};
 use skills::*;
+use std::collections::HashMap;
 use weapons::guns::*;
 use weapons::*;
 
@@ -32,7 +32,6 @@ fn main() {
         .add_weapon(Weapon::Blade(blade_factory.katana()))
         .add_armor(Armor::new(10.0, 5.0));
 
-
     println!("{}", player1.pretty_print());
     println!("{}", player2.pretty_print());
     println!("{}", player3.pretty_print());
@@ -45,9 +44,11 @@ fn main() {
 
     println!(
         "| {0:<5} | {1:<10} | {2:<10} | {3:>6} | {4:>4} |",
-         "Round", "Attacker", "Attacked", "Damage", "HP"
+        "Round", "Attacker", "Attacked", "Damage", "HP"
     );
-    while players.iter().any(|p: (&String, &Player)| p.1.is_alive()) && loop_counter <= max_loop_count {
+    while players.iter().any(|p: (&String, &Player)| p.1.is_alive())
+        && loop_counter <= max_loop_count
+    {
         let mut live_players: Vec<String> = live_players(&players);
 
         if live_players.len() == 1 {

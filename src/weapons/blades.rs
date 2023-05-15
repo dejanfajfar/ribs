@@ -1,5 +1,5 @@
-use std::fmt::Display;
 use std::fmt;
+use std::fmt::Display;
 use std::fmt::Result;
 
 use crate::damage::hit::*;
@@ -10,7 +10,7 @@ use crate::weapons::*;
 #[derive(Debug, Default, Clone)]
 pub struct Blade {
     stats: BaseWeaponAttributes,
-    min_skill: Option<Skills>
+    min_skill: Option<Skills>,
 }
 
 impl DmgDealer for Blade {
@@ -41,14 +41,14 @@ pub struct BladeFactory;
 
 impl BladeFactory {
     pub fn katana(&self) -> Blade {
-        return Blade{
+        return Blade {
             stats: BaseWeaponAttributes {
                 damage_type: DamageType::Slashing,
-                base_damage : 100,
+                base_damage: 100,
                 name: String::from("Katana"),
-                weight: 6
+                weight: 6,
             },
-            min_skill: Some(Skills::new(2, 6))
-        }
+            min_skill: Some(Skills::new(2, 6)),
+        };
     }
 }

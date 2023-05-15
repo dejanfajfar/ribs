@@ -1,8 +1,8 @@
-pub mod guns;
 pub mod blades;
+pub mod guns;
 
-use crate::guns::Gun;
 use crate::blades::Blade;
+use crate::guns::Gun;
 use rand::{thread_rng, Rng};
 
 use crate::damage::*;
@@ -11,7 +11,7 @@ use crate::skills::*;
 #[derive(Debug, Clone)]
 pub enum Weapon {
     Gun(Gun),
-    Blade(Blade)
+    Blade(Blade),
 }
 
 impl DmgDealer for Weapon {

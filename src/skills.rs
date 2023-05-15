@@ -1,19 +1,20 @@
-mod skillpoint;
+pub mod skillpoint;
 
 use rand::{thread_rng, Rng};
+use skillpoint::*;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Skills {
-    strength: u8,
-    dexterity: u8,
+    strength: SkillPoint,
+    dexterity: SkillPoint,
 }
 
 impl Skills {
     pub fn new(strength: u8, dexterity: u8) -> Self {
-        let mut new_skill = Skills::default();
-        *new_skill.strength_mut() = strength;
-        *new_skill.dexterity_mut() = dexterity;
-        return new_skill;
+        return Skills {
+            dexterity: SkillPoint::from(dexterity),
+            strength: SkillPoint::from(strength),
+        };
     }
 
     pub fn skill_check(&self, min: Option<Skills>) -> bool {
@@ -27,18 +28,17 @@ impl Skills {
     }
 
     fn calculate_hit_probability(&self, min_requirements: Skills) -> f64 {
-        match self.dexterity() {
+        match self.dexterity().raw_value() {
             0..=2 => 0.2,
             10 => 1.0,
             _ => {
-                let gap: i16 =
-                    i16::from(self.dexterity()) - i16::from(min_requirements.dexterity());
+                let gap_2: SkillPoint = self.dexterity() - min_requirements.dexterity();
+                let gap_raw: u8 = gap_2.raw_value();
 
-                match gap {
+                match gap_raw {
                     0 => 0.5,
-                    ..=-1 => 0.5 - f64::from(gap.abs()) * 0.05,
-                    1..=2 => 0.5 + f64::from(gap) * 0.1,
-                    3.. => 0.6 + f64::from(gap) * 0.05,
+                    1..=2 => 0.5 + f64::from(gap_raw) * 0.1,
+                    3.. => 0.6 + f64::from(gap_raw) * 0.05,
                 }
             }
         }
@@ -56,43 +56,26 @@ impl Skills {
         }
     }
 
-    pub fn normalize_skill(input: u8) -> u8 {
-        match input {
-            0..=10 => input,
-            _ => 10,
-        }
+    pub fn strength(&self) -> SkillPoint {
+        return self.strength;
     }
 
-    pub fn normalize_skill_mut(input: &mut u8) -> &mut u8 {
-        match input {
-            0..=10 => input,
-            _ => {
-                *input = 10;
-                return input;
-            }
-        }
+    pub fn strength_mut(&mut self) -> &mut SkillPoint {
+        return &mut self.strength;
     }
 
-    pub fn strength(&self) -> u8 {
-        return Self::normalize_skill(self.strength);
+    pub fn dexterity(&self) -> SkillPoint {
+        return self.dexterity;
     }
 
-    pub fn strength_mut(&mut self) -> &mut u8 {
-        return Self::normalize_skill_mut(&mut self.strength);
-    }
-
-    pub fn dexterity(&self) -> u8 {
-        return Self::normalize_skill(self.dexterity);
-    }
-
-    pub fn dexterity_mut(&mut self) -> &mut u8 {
-        return Self::normalize_skill_mut(&mut self.dexterity);
+    pub fn dexterity_mut(&mut self) -> &mut SkillPoint {
+        return &mut self.dexterity;
     }
 }
 
 pub struct SkillsFactory;
 
-impl SkillsFactory{
+impl SkillsFactory {
     pub fn random(&self) -> Skills {
         let mut rng = thread_rng();
         return Skills::new(rng.gen_range(1..=10), rng.gen_range(1..=10));
@@ -117,9 +100,9 @@ mod skills_test {
 
     #[test]
     fn strength_mut_as_setter() {
-        let mut s = Skills::default();
-        *s.strength_mut() = 15;
-        assert_eq!(10, s.strength());
+        let mut s: Skills = Skills::default();
+        *s.strength_mut() = SkillPoint::from(15);
+        assert_eq!(SkillPoint::MAX, s.strength());
     }
 
     #[test]

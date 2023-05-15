@@ -61,7 +61,10 @@ impl Player {
     }
 
     pub fn add_weapon(self, weapon: Weapon) -> Self {
-        Self { weapon: Some(weapon), ..self }
+        Self {
+            weapon: Some(weapon),
+            ..self
+        }
     }
 
     pub fn add_armor(self, armor: Armor) -> Self {
@@ -89,9 +92,7 @@ impl Player {
                 }
                 g.attack(player_skills)
             }
-            Some(Weapon::Blade(b)) => {
-                b.attack(player_skills)
-            }
+            Some(Weapon::Blade(b)) => b.attack(player_skills),
         }
     }
 
@@ -102,18 +103,31 @@ impl Player {
         print_out.push('\n');
         print_out.push_str(format!("HP : {}", self.hit_points).as_str());
         print_out.push('\n');
-        print_out.push_str(format!("Strength : {0:<5} Dexterity : {1:<5}", self.skills.strength(), self.skills.dexterity()).as_str());
+        print_out.push_str(
+            format!(
+                "Strength : {0:<5} Dexterity : {1:<5}",
+                self.skills.strength(),
+                self.skills.dexterity()
+            )
+            .as_str(),
+        );
         print_out.push('\n');
         print_out.push_str(format!("{:-^1$}", "Weapon", 40).as_str());
         print_out.push('\n');
 
-        if self.weapon.is_some(){
-            let weapon: &Weapon =  self.weapon.as_ref().ok_or("no weapon equipped").unwrap();
+        if self.weapon.is_some() {
+            let weapon: &Weapon = self.weapon.as_ref().ok_or("no weapon equipped").unwrap();
             print_out.push_str(format!("Name: {}", weapon.stats().name).as_str());
             print_out.push('\n');
-            print_out.push_str(format!("Base damage: {0:<5} Damage type : {1}", weapon.stats().base_damage, weapon.stats().damage_type).as_str());
-        }
-        else {
+            print_out.push_str(
+                format!(
+                    "Base damage: {0:<5} Damage type : {1}",
+                    weapon.stats().base_damage,
+                    weapon.stats().damage_type
+                )
+                .as_str(),
+            );
+        } else {
             print_out.push_str("No weapon equipped");
         }
 
