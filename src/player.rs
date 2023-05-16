@@ -60,6 +60,10 @@ impl Player {
         return self.name.clone();
     }
 
+    pub fn hit_points(&self) -> u16 {
+        self.hit_points
+    }
+
     pub fn add_weapon(self, weapon: Weapon) -> Self {
         Self {
             weapon: Some(weapon),
@@ -116,7 +120,7 @@ impl Player {
         print_out.push('\n');
 
         if self.weapon.is_some() {
-            let weapon: &Weapon = self.weapon.as_ref().ok_or("no weapon equipped").unwrap();
+            let weapon: Weapon = self.weapon.clone().unwrap();
             print_out.push_str(format!("Name: {}", weapon.stats().name).as_str());
             print_out.push('\n');
             print_out.push_str(
@@ -129,6 +133,24 @@ impl Player {
             );
         } else {
             print_out.push_str("No weapon equipped");
+        }
+
+        print_out.push('\n');
+        print_out.push_str(format!("{:-^1$}", "Armor", 40).as_str());
+        print_out.push('\n');
+
+        if self.armor.is_some() {
+            let armor: Armor = self.armor.clone().unwrap();
+            print_out.push_str(
+                format!(
+                    "Piercing : {0:<5} Slashing : {1:<5}",
+                    armor.piercing_reduction(),
+                    armor.slashing_reduction()
+                )
+                .as_str(),
+            );
+        } else {
+            print_out.push_str("No armor equipped");
         }
 
         return print_out;

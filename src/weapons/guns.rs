@@ -48,7 +48,7 @@ impl DmgDealer for Gun {
             return Damage::Miss;
         }
 
-        if !player_skills.skill_check(self.min_skill) {
+        if Some(player_skills) < self.min_skill {
             return Damage::Miss;
         }
 

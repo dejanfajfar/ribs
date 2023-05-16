@@ -110,46 +110,28 @@ mod tests {
     use super::*;
 
     #[test]
-    fn add_self_0_then_other_taken() {
-        for other_points_value in 0..10 {
-            let test_result: SkillPoint = SkillPoint::MIN
-                + SkillPoint {
-                    point_value: other_points_value,
-                };
-
-            assert_eq!(test_result.point_value, other_points_value)
-        }
-    }
-
-    #[test]
-    fn add_self_10_then_always_10() {
-        for other_points_value in 0..10 {
-            let test_result: SkillPoint = SkillPoint::MAX
-                + SkillPoint {
-                    point_value: other_points_value,
-                };
-
-            assert_eq!(test_result.point_value, SkillPoint::MAX_VALUE);
-        }
-    }
-
-    #[test]
-    fn add_tests() {
-        for own_value in SkillPoint::MIN_VALUE..SkillPoint::MAX_VALUE {
-            for other_value in SkillPoint::MIN_VALUE..SkillPoint::MAX_VALUE {
-                assert_eq!(
-                    SkillPoint::from(own_value + other_value),
-                    SkillPoint::from(own_value) + SkillPoint::from(other_value)
-                );
-            }
-        }
+    fn add() {
+        assert_eq!(SkillPoint::MAX, SkillPoint::MAX + SkillPoint::MAX);
+        assert_eq!(SkillPoint::MIN, SkillPoint::MIN + SkillPoint::MIN);
+        assert_eq!(SkillPoint::MAX, SkillPoint::MAX + SkillPoint::MIN);
+        assert_eq!(SkillPoint::MAX, SkillPoint::MIN + SkillPoint::MAX); // reversible
+        assert_eq!(SkillPoint::MAX, SkillPoint::from(6) + SkillPoint::from(6));
+        assert_eq!(
+            SkillPoint::from(6),
+            SkillPoint::from(3) + SkillPoint::from(3)
+        );
+        assert_eq!(SkillPoint::from(3), SkillPoint::from(3) + SkillPoint::MIN);
+        assert_eq!(SkillPoint::from(3), SkillPoint::MIN + SkillPoint::from(3));
     }
 
     #[test]
     fn sub() {
         assert_eq!(SkillPoint::MIN, SkillPoint::MAX - SkillPoint::MAX);
         assert_eq!(SkillPoint::MAX, SkillPoint::MAX - SkillPoint::MIN);
-        assert_eq!(SkillPoint::from(3), SkillPoint::from(6) - SkillPoint::from(3));
+        assert_eq!(
+            SkillPoint::from(3),
+            SkillPoint::from(6) - SkillPoint::from(3)
+        );
         assert_eq!(SkillPoint::MIN, SkillPoint::from(3) - SkillPoint::from(6));
     }
 
@@ -178,7 +160,7 @@ mod tests {
     }
 
     #[test]
-    fn eq_with_u8(){
+    fn eq_with_u8() {
         let s1: SkillPoint = SkillPoint::from(3);
 
         assert_eq!(true, s1 == 3);
@@ -205,5 +187,14 @@ mod tests {
     fn eq_min() {
         assert_eq!(true, SkillPoint::MIN == SkillPoint::MIN);
         assert_eq!(true, SkillPoint::MAX != SkillPoint::MIN);
+    }
+
+    #[test]
+    fn ord() {
+        let s1: SkillPoint = SkillPoint::from(3);
+        let s2: SkillPoint = SkillPoint::from(4);
+
+        assert_eq!(true, s1 < s2);
+        assert_eq!(true, s1 <= s1);
     }
 }

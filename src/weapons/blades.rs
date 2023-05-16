@@ -15,7 +15,7 @@ pub struct Blade {
 
 impl DmgDealer for Blade {
     fn attack(&mut self, player_skills: Skills) -> Damage {
-        if !player_skills.skill_check(self.min_skill) {
+        if Some(player_skills) < self.min_skill {
             return Damage::Miss;
         }
 

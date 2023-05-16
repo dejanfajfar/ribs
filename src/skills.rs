@@ -1,5 +1,7 @@
 pub mod skillpoint;
 
+use std::cmp::Ordering;
+
 use rand::{thread_rng, Rng};
 use skillpoint::*;
 
@@ -15,16 +17,6 @@ impl Skills {
             dexterity: SkillPoint::from(dexterity),
             strength: SkillPoint::from(strength),
         };
-    }
-
-    pub fn skill_check(&self, min: Option<Skills>) -> bool {
-        match min {
-            None => return true,
-            Some(min_skill) => {
-                return self.strength() >= min_skill.strength()
-                    && self.dexterity() >= min_skill.dexterity()
-            }
-        }
     }
 
     fn calculate_hit_probability(&self, min_requirements: Skills) -> f64 {
@@ -60,16 +52,24 @@ impl Skills {
         return self.strength;
     }
 
-    pub fn strength_mut(&mut self) -> &mut SkillPoint {
-        return &mut self.strength;
-    }
-
     pub fn dexterity(&self) -> SkillPoint {
         return self.dexterity;
     }
+}
 
-    pub fn dexterity_mut(&mut self) -> &mut SkillPoint {
-        return &mut self.dexterity;
+impl PartialEq for Skills {
+    fn eq(&self, other: &Self) -> bool {
+        self.strength == other.strength && self.dexterity == other.dexterity
+    }
+}
+
+impl PartialOrd for Skills {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match self.strength.partial_cmp(&other.strength) {
+            Some(Ordering::Equal) => {}
+            ord => return ord,
+        }
+        self.dexterity.partial_cmp(&other.dexterity)
     }
 }
 
@@ -87,7 +87,7 @@ impl SkillsFactory {
 }
 
 #[cfg(test)]
-mod skills_test {
+mod tests {
     use super::*;
     use approx::assert_relative_eq;
 
@@ -187,5 +187,27 @@ mod skills_test {
         let min_skills: Skills = Skills::new(0, min_dex);
 
         return player_skills.calculate_hit_probability(min_skills);
+    }
+
+    #[test]
+    fn ord_same_values() {
+        let s1 = Skills::new(3, 3);
+        let s2 = Skills::new(4, 4);
+
+        assert_eq!(true, s1 < s2);
+        assert_eq!(true, s1 <= s2);
+        assert_eq!(true, s1 <= s1);
+        assert_eq!(true, s1 >= s1);
+    }
+
+    #[test]
+    fn ord_different_values() {
+        let s1 = Skills::new(3, 4);
+        let s2 = Skills::new(5, 4);
+
+        assert_eq!(true, s1 < s2);
+        assert_eq!(true, s1 <= s2);
+        assert_eq!(false, s2 < s1);
+        assert_eq!(false, s2 <= s1);
     }
 }

@@ -72,6 +72,16 @@ fn main() {
 
         loop_counter += 1;
     }
+
+    for (player_name, player_data) in players {
+        if player_data.is_alive() {
+            println!(
+                "{0} is the winner with {1} HP remaining",
+                player_name,
+                player_data.hit_points()
+            );
+        }
+    }
 }
 
 fn choose_two(players: &mut Vec<String>) -> (&String, &String) {

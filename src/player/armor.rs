@@ -33,6 +33,14 @@ impl Armor {
             }
         }
     }
+
+    pub fn piercing_reduction(&self) -> f32 {
+        self.piercing
+    }
+
+    pub fn slashing_reduction(&self) -> f32 {
+        self.slashing
+    }
 }
 
 #[cfg(test)]
