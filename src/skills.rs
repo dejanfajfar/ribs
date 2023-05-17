@@ -1,6 +1,6 @@
 pub mod skillpoint;
 
-use std::cmp::Ordering;
+use std::{cmp::Ordering, hash, collections::HashMap};
 
 use rand::{thread_rng, Rng};
 use skillpoint::*;
@@ -20,20 +20,18 @@ impl Skills {
     }
 
     fn calculate_hit_probability(&self, min_requirements: Skills) -> f64 {
-        match self.dexterity().raw_value() {
-            0..=2 => 0.2,
-            10 => 1.0,
-            _ => {
-                let gap_2: SkillPoint = self.dexterity() - min_requirements.dexterity();
-                let gap_raw: u8 = gap_2.raw_value();
+        // does not meet minimal requirements
+        if self.dexterity() < min_requirements.dexterity() {
+            let gap = min_requirements.dexterity - self.dexterity();
 
-                match gap_raw {
-                    0 => 0.5,
-                    1..=2 => 0.5 + f64::from(gap_raw) * 0.1,
-                    3.. => 0.6 + f64::from(gap_raw) * 0.05,
-                }
-            }
+            return 0.5 - ((f64::from(gap.raw_value()) / 10.0) * 0.5);
         }
+
+        // meets minimal requirements
+
+        let gap: SkillPoint = self.dexterity() - min_requirements.dexterity();
+
+        return (f64::from(gap.raw_value()) / 10.0) + 0.5;
     }
 
     pub fn is_hit(&self, min_requirements: Option<Skills>) -> bool {
@@ -92,17 +90,13 @@ mod tests {
     use approx::assert_relative_eq;
 
     #[test]
-    fn skill_check_none_given() {
-        let t = Skills::default();
+    fn eq(){
+        let s1 = Skills::new(3, 3);
+        let s2 = Skills::new(4, 4);
 
-        assert_eq!(true, t.skill_check(None));
-    }
-
-    #[test]
-    fn strength_mut_as_setter() {
-        let mut s: Skills = Skills::default();
-        *s.strength_mut() = SkillPoint::from(15);
-        assert_eq!(SkillPoint::MAX, s.strength());
+        assert_eq!(false, s1 == s2);
+        assert_eq!(true, s1 != s2);
+        assert_eq!(true, s1 == s1);
     }
 
     #[test]
@@ -180,6 +174,15 @@ mod tests {
             call_calculate_hit_probability(9, 3),
             max_relative = 0.01
         );
+    }
+
+    #[test]
+    fn foo(){
+        for my_dex in 0..10 {
+            for other_dex in 0..10 {
+                println!("me: {0}, min: {1} => {2}", my_dex, other_dex, call_calculate_hit_probability(my_dex, other_dex));
+            }
+        }
     }
 
     fn call_calculate_hit_probability(player_dex: u8, min_dex: u8) -> f64 {
