@@ -2,8 +2,9 @@ use std::{
     fmt::Display,
     ops::{Add, Sub},
 };
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Eq)]
+#[derive(Debug, Clone, Copy, Eq, Serialize, Deserialize)]
 pub struct SkillPoint {
     point_value: u8,
 }

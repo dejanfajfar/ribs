@@ -4,8 +4,9 @@ use crate::damage::hit::*;
 use crate::damage::*;
 use crate::skills::*;
 use crate::weapons::*;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Gun {
     stats: BaseWeaponAttributes,
     clip_size: u16,

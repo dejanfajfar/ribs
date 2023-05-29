@@ -1,7 +1,8 @@
 use crate::damage::hit::*;
 use crate::damage::*;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
 pub struct Armor {
     piercing: f32,
     slashing: f32,

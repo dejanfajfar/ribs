@@ -1,11 +1,12 @@
 pub mod skillpoint;
 
-use std::{cmp::Ordering, hash, collections::HashMap};
+use std::cmp::Ordering;
+use serde::{Deserialize, Serialize};
 
 use rand::{thread_rng, Rng};
 use skillpoint::*;
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
 pub struct Skills {
     strength: SkillPoint,
     dexterity: SkillPoint,
@@ -21,7 +22,9 @@ impl Skills {
 
     fn calculate_hit_probability(&self, min_requirements: Skills) -> f64 {
         // this one special case where you need max dex to wield a weapon an you have max dex, then you should have a hit!
-        if self.dexterity() == min_requirements.dexterity() && min_requirements.dexterity() == SkillPoint::MAX {
+        if self.dexterity() == min_requirements.dexterity()
+            && min_requirements.dexterity() == SkillPoint::MAX
+        {
             return 1.0;
         }
 
@@ -35,7 +38,7 @@ impl Skills {
                 2 => return 0.4,
                 3 => return 0.3,
                 4 => return 0.2,
-                _ => return 0.1
+                _ => return 0.1,
             }
         }
 
@@ -53,7 +56,7 @@ impl Skills {
             2 => return 0.6,
             3 => return 0.7,
             4 => return 0.8,
-            _ => return 0.9
+            _ => return 0.9,
         };
     }
 
@@ -113,7 +116,7 @@ mod tests {
     use approx::assert_relative_eq;
 
     #[test]
-    fn eq(){
+    fn eq() {
         let s1 = Skills::new(3, 3);
         let s2 = Skills::new(4, 4);
 
@@ -135,8 +138,16 @@ mod tests {
         assert_eq!(0.5, call_calculate_hit_probability(9, 9));
         assert_eq!(1.0, call_calculate_hit_probability(10, 10));
 
-        assert_relative_eq!(0.45, call_calculate_hit_probability(0, 1), max_relative = 0.01);
-        assert_relative_eq!(0.4, call_calculate_hit_probability(0, 2), max_relative = 0.01);
+        assert_relative_eq!(
+            0.45,
+            call_calculate_hit_probability(0, 1),
+            max_relative = 0.01
+        );
+        assert_relative_eq!(
+            0.4,
+            call_calculate_hit_probability(0, 2),
+            max_relative = 0.01
+        );
 
         // middle sample Player dex = 5
         assert_relative_eq!(
@@ -194,15 +205,18 @@ mod tests {
             call_calculate_hit_probability(5, 10),
             max_relative = 0.01
         );
-
-        
     }
 
     #[test]
-    fn foo(){
+    fn foo() {
         for my_dex in 0..=10 {
             for other_dex in 0..=10 {
-                println!("me: {0}, min: {1} => {2}", my_dex, other_dex, call_calculate_hit_probability(my_dex, other_dex));
+                println!(
+                    "me: {0}, min: {1} => {2}",
+                    my_dex,
+                    other_dex,
+                    call_calculate_hit_probability(my_dex, other_dex)
+                );
             }
         }
     }

@@ -2,12 +2,13 @@ use std::{
     fmt::{Display, Formatter, Result},
     ops::Add,
 };
+use serde::{Deserialize, Serialize};
 
 pub mod hit;
 
 use crate::hit::*;
 
-#[derive(Default, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Default, Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum DamageType {
     #[default]
     Piercing,

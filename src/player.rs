@@ -1,12 +1,13 @@
 use crate::damage::*;
 use crate::skills::*;
 use crate::weapons::{DmgDealer, Weapon};
+use serde::{Deserialize, Serialize};
 
 pub mod armor;
 
 use armor::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Player {
     name: String,
     skills: Skills,

@@ -4,11 +4,12 @@ pub mod guns;
 use crate::blades::Blade;
 use crate::guns::Gun;
 use rand::{thread_rng, Rng};
+use serde::{Deserialize, Serialize};
 
 use crate::damage::*;
 use crate::skills::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Weapon {
     Gun(Gun),
     Blade(Blade),
@@ -36,7 +37,7 @@ pub trait DmgDealer {
     fn stats(&self) -> &BaseWeaponAttributes;
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct BaseWeaponAttributes {
     pub name: String,
     pub base_damage: u16,
@@ -46,8 +47,8 @@ pub struct BaseWeaponAttributes {
 
 impl BaseWeaponAttributes {
     pub fn hit_damage(&self) -> f32 {
-        let mut rng = thread_rng();
-        let damage = f32::from(self.base_damage) * rng.gen_range(0.875..1.125);
+        let mut rng: rand::rngs::ThreadRng = thread_rng();
+        let damage: f32 = f32::from(self.base_damage) * rng.gen_range(0.875..1.125);
         return damage.ceil();
     }
 }
