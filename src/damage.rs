@@ -5,6 +5,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 
 pub mod hit;
+pub mod hitDamage;
 
 use crate::hit::*;
 
