@@ -4,7 +4,7 @@ use std::{
 };
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, Deserialize)]
 pub struct SkillPoint {
     point_value: u8,
 }
@@ -62,6 +62,14 @@ impl Add for SkillPoint {
             }
             _ => SkillPoint::MAX,
         }
+    }
+}
+
+impl Serialize for SkillPoint {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer {
+        serializer.serialize_u8(self.point_value)
     }
 }
 
