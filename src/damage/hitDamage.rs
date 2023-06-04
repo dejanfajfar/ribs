@@ -1,18 +1,19 @@
 use std::{clone, ops::AddAssign};
 
-///
-/// Defines the actual damage in hit points
-/// 
-/// # Note
-/// 
-/// Opted for a simple damage model without damage types in order to
-/// concentrate efforts on features and to not complicate things to much
-/// 
-/// # Range
-///
-/// A hit can have a range of -9999 to 9999
-/// 
-/// > Negative numbers can be used to add hit points to the player
+/**
+Defines the actual damage in hit points
+
+# Note
+
+Opted for a simple damage model without damage types in order to
+concentrate efforts on features and to not complicate things to much
+
+# Range
+
+A hit can have a range of -9999 to 9999
+
+> Negative numbers can be used to add hit points to the player
+*/
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 struct HitDamage{
     value: i16
@@ -55,4 +56,19 @@ impl Default for HitDamage {
     fn default() -> Self {
         Self { value: 0 }
     }
+}
+
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn from_in_range(){
+        let test_object: HitDamage = HitDamage::from(15);
+
+        assert_eq!(15, test_object.value);
+    }
+
+    
 }
