@@ -1,8 +1,8 @@
+use serde::{Deserialize, Serialize};
 use std::{
     fmt::{Display, Formatter, Result},
     ops::Add,
 };
-use serde::{Deserialize, Serialize};
 
 pub mod hit;
 pub mod hitDamage;

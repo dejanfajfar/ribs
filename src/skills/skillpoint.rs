@@ -1,8 +1,8 @@
+use serde::{Deserialize, Serialize};
 use std::{
     fmt::Display,
     ops::{Add, Sub},
 };
-use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, Eq, Deserialize)]
 pub struct SkillPoint {
@@ -68,7 +68,8 @@ impl Add for SkillPoint {
 impl Serialize for SkillPoint {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: serde::Serializer {
+        S: serde::Serializer,
+    {
         serializer.serialize_u8(self.point_value)
     }
 }

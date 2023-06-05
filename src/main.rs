@@ -9,11 +9,11 @@ use damage::*;
 use player::armor::*;
 use player::*;
 use rand::seq::{SliceChooseIter, SliceRandom};
+use serde_json::Result;
 use skills::*;
 use std::collections::HashMap;
 use weapons::guns::*;
 use weapons::*;
-use serde_json::Result;
 
 use crate::weapons::blades::BladeFactory;
 
@@ -41,7 +41,7 @@ fn main() {
     let battlefield_json = serde_json::to_string_pretty(&battlefield).unwrap();
 
     let results = battlefield.start();
-    
+
     let results_json = serde_json::to_string_pretty(&results).unwrap();
 
     println!("{}", battlefield_json);

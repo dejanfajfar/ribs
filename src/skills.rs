@@ -1,7 +1,7 @@
 pub mod skillpoint;
 
-use std::cmp::Ordering;
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 
 use rand::{thread_rng, Rng};
 use skillpoint::*;
