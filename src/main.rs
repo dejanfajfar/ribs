@@ -4,18 +4,13 @@ mod player;
 mod skills;
 mod weapons;
 
+use crate::weapons::blades::BladeFactory;
 use battlefield::*;
-use damage::*;
 use player::armor::*;
 use player::*;
-use rand::seq::{SliceChooseIter, SliceRandom};
-use serde_json::Result;
 use skills::*;
-use std::collections::HashMap;
 use weapons::guns::*;
 use weapons::*;
-
-use crate::weapons::blades::BladeFactory;
 
 fn main() {
     let mut battlefield: BattleField = BattleField::default();
@@ -32,7 +27,7 @@ fn main() {
 
     let player2 = Player::new("Dave".to_owned(), skills_factory.ninja(), 400)
         .add_weapon(Weapon::Blade(blade_factory.katana()))
-        .add_armor(Armor::new(10.0, 5.0));
+        .add_armor(Armor::new(10));
 
     battlefield.add_player(player1);
     battlefield.add_player(player2);

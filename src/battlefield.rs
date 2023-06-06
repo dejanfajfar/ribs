@@ -22,12 +22,12 @@ pub struct BattleResult {
 #[derive(Serialize, Deserialize)]
 pub struct BattleRoundResults {
     pub round_num: u16,
-    pub actions: Vec<BattleRoundAction>,
+    pub actions: Vec<BattleAction>,
 }
 
 #[derive(Serialize, Deserialize)]
-pub enum BattleRoundAction {
-    Attack(String, String, u16),
+pub enum BattleAction {
+    Attack(String, String, i16),
     None(String),
 }
 
@@ -43,9 +43,9 @@ impl BattleRoundResults {
         &mut self,
         player_identifier: String,
         target_identifier: String,
-        dmg_taken: u16,
+        dmg_taken: i16,
     ) {
-        self.actions.push(BattleRoundAction::Attack(
+        self.actions.push(BattleAction::Attack(
             player_identifier,
             target_identifier,
             dmg_taken,
@@ -53,8 +53,7 @@ impl BattleRoundResults {
     }
 
     pub fn add_inaction(&mut self, player_identifier: String) {
-        self.actions
-            .push(BattleRoundAction::None(player_identifier));
+        self.actions.push(BattleAction::None(player_identifier));
     }
 
     pub fn take_player_action(
@@ -67,9 +66,9 @@ impl BattleRoundResults {
 
         match target {
             Some(t) => {
-                let player_dmg_output: Damage = player.attack();
-                let target_dmg: (u16, u16) = t.apply_damage(player_dmg_output);
-                self.add_action(player.name(), t.name(), target_dmg.0);
+                let player_dmg_output: Option<Damage> = player.attack();
+                let target_dmg: (Damage, u16) = t.apply_damage(player_dmg_output);
+                self.add_action(player.name(), t.name(), target_dmg.0.damage());
                 return (player, Some(t.to_owned()));
             }
             None => {
