@@ -1,16 +1,12 @@
-mod battlefield;
-mod damage;
-mod player;
-mod skills;
-mod weapons;
+mod engine;
 
-use crate::weapons::blades::BladeFactory;
-use battlefield::*;
-use player::armor::*;
-use player::*;
-use skills::*;
-use weapons::guns::*;
-use weapons::*;
+use crate::engine::{
+    armor::Armor,
+    battlefield::BattleField,
+    player::Player,
+    skills::SkillsFactory,
+    weapons::{blades::BladeFactory, guns::GunFactory, Weapon},
+};
 
 fn main() {
     let mut battlefield: BattleField = BattleField::default();
@@ -27,7 +23,7 @@ fn main() {
 
     let player2 = Player::new("Dave".to_owned(), skills_factory.ninja(), 400)
         .add_weapon(Weapon::Blade(blade_factory.katana()))
-        .add_armor(Armor::new(10));
+        .add_armor(Armor::new(10, false));
 
     battlefield.add_player(player1);
     battlefield.add_player(player2);

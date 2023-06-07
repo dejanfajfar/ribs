@@ -1,7 +1,8 @@
-use crate::damage::*;
-use crate::skills::*;
-use crate::weapons::*;
 use serde::{Deserialize, Serialize};
+
+use crate::engine::{damage::Damage, skills::Skills};
+
+use super::{weapon_stats::WeaponStats, DmgDealer};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Blade {

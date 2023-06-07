@@ -1,7 +1,4 @@
-use std::{
-    clone,
-    ops::{Add, AddAssign, Mul, Sub},
-};
+use std::ops::{Add, AddAssign, Mul, Sub};
 
 /**
 Defines the actual damage in hit points
@@ -122,8 +119,8 @@ impl From<i32> for Damage {
         if value < i32::from(i16::MIN) {
             return Damage::from(i16::MIN);
         }
-        
-        return Damage::from(value as i16)
+
+        return Damage::from(value as i16);
     }
 }
 

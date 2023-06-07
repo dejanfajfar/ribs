@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
-use crate::damage::Damage;
-use crate::player::Player;
 use chrono::{DateTime, Utc};
 use rand::seq::SliceRandom;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
+
+use super::damage::Damage;
+use super::player::Player;
 
 #[derive(Serialize, Deserialize)]
 pub struct BattleField {
@@ -23,6 +24,7 @@ pub struct BattleResult {
 pub struct BattleRoundResults {
     pub round_num: u16,
     pub actions: Vec<BattleAction>,
+    pub player_health: HashMap<String, u16>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -36,6 +38,7 @@ impl BattleRoundResults {
         return BattleRoundResults {
             round_num: round_num,
             actions: vec![],
+            player_health: HashMap::default(),
         };
     }
 

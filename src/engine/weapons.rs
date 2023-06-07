@@ -2,14 +2,14 @@ pub mod blades;
 pub mod guns;
 pub mod weapon_stats;
 
-use crate::blades::Blade;
-use crate::guns::Gun;
-use crate::weapon_stats::WeaponStats;
-
 use serde::{Deserialize, Serialize};
 
-use crate::damage::*;
-use crate::skills::*;
+use self::blades::Blade;
+use self::guns::Gun;
+use self::weapon_stats::WeaponStats;
+
+use super::damage::Damage;
+use super::skills::Skills;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Weapon {

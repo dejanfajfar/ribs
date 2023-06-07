@@ -1,7 +1,7 @@
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 
-use crate::damage::Damage;
+use crate::engine::damage::Damage;
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct WeaponStats {

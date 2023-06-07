@@ -72,10 +72,6 @@ impl Skills {
         }
     }
 
-    pub fn strength(&self) -> SkillPoint {
-        return self.strength;
-    }
-
     pub fn dexterity(&self) -> SkillPoint {
         return self.dexterity;
     }

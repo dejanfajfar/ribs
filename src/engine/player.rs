@@ -1,11 +1,11 @@
-use crate::damage::*;
-use crate::skills::*;
-use crate::weapons::{DmgDealer, Weapon};
 use serde::{Deserialize, Serialize};
 
-pub mod armor;
-
-use armor::*;
+use super::{
+    armor::{Armor, DmgReduction},
+    damage::Damage,
+    skills::Skills,
+    weapons::{DmgDealer, Weapon},
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Player {
