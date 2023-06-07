@@ -29,8 +29,44 @@ pub struct BattleRoundResults {
 
 #[derive(Serialize, Deserialize)]
 pub enum BattleAction {
-    Attack(String, String, i16),
+    Attack(AttackAction),
     None(String),
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct AttackAction {
+    attacker: String,
+    target: String,
+    attack_dmg: i16,
+    dmg_taken: i16,
+    target_hit_points_remaining: u16,
+}
+
+impl AttackAction {
+    pub fn new(
+        attacker: String,
+        target: String,
+        attack_dmg: Option<Damage>,
+        dmg_taken: Damage,
+        target_hit_points_remaining: u16,
+    ) -> AttackAction {
+        match attack_dmg {
+            Some(d) => AttackAction {
+                attacker,
+                target,
+                attack_dmg: d.damage(),
+                dmg_taken: dmg_taken.damage(),
+                target_hit_points_remaining,
+            },
+            None => AttackAction {
+                attacker,
+                target,
+                attack_dmg: 0,
+                dmg_taken: dmg_taken.damage(),
+                target_hit_points_remaining,
+            },
+        }
+    }
 }
 
 impl BattleRoundResults {
@@ -42,21 +78,8 @@ impl BattleRoundResults {
         };
     }
 
-    pub fn add_action<'a>(
-        &mut self,
-        player_identifier: String,
-        target_identifier: String,
-        dmg_taken: i16,
-    ) {
-        self.actions.push(BattleAction::Attack(
-            player_identifier,
-            target_identifier,
-            dmg_taken,
-        ));
-    }
-
-    pub fn add_inaction(&mut self, player_identifier: String) {
-        self.actions.push(BattleAction::None(player_identifier));
+    pub fn add_action<'a>(&mut self, action: BattleAction) {
+        self.actions.push(action);
     }
 
     pub fn take_player_action(
@@ -71,11 +94,17 @@ impl BattleRoundResults {
             Some(t) => {
                 let player_dmg_output: Option<Damage> = player.attack();
                 let target_dmg: (Damage, u16) = t.apply_damage(player_dmg_output);
-                self.add_action(player.name(), t.name(), target_dmg.0.damage());
+                self.add_action(BattleAction::Attack(AttackAction::new(
+                    player.name(),
+                    t.name(),
+                    player_dmg_output,
+                    target_dmg.0,
+                    target_dmg.1,
+                )));
                 return (player, Some(t.to_owned()));
             }
             None => {
-                self.add_inaction(player.name());
+                self.add_action(BattleAction::None((player.name())));
                 return (player, None);
             }
         }
