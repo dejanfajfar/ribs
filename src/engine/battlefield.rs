@@ -104,7 +104,7 @@ impl BattleRoundResults {
                 return (player, Some(t.to_owned()));
             }
             None => {
-                self.add_action(BattleAction::None((player.name())));
+                self.add_action(BattleAction::None(player.name()));
                 return (player, None);
             }
         }
