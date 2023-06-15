@@ -34,6 +34,6 @@ pub fn get_battlefield() -> String {
 
     let results_json = serde_json::to_string_pretty(&results).unwrap();
 
-    println!("{}", battlefield_json);
+    //println!("{}", battlefield_json);
     return results_json;
 }
