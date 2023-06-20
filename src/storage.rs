@@ -1,51 +1,41 @@
-pub mod entities;
+pub mod armor_store;
 
-use entities::ArmorEntity;
+use rocket::data;
+use std::env;
+use surrealdb::engine::remote::ws::{Client, Ws};
+use surrealdb::opt::auth::{Database, Root};
 use surrealdb::Surreal;
-use surrealdb::engine::remote::ws::Ws;
-use surrealdb::opt::auth::Root;
 
-pub async fn get_all_armors() -> surrealdb::Result<Vec<ArmorEntity>> {
-    let db = Surreal::new::<Ws>("127.0.0.1:8000").await?;
+pub async fn connect_to_db<'a>() -> surrealdb::Result<Surreal<Client>> {
+    let address = env_or_default("db_address", "127.0.0.1:8000");
+    let username = env_or_default("db_username", "root");
+    let password = env_or_default("db_password", "root");
+    let namespace = env_or_default("db_namespace", "development");
+    let database = env_or_default("db_name", "ribs");
+
+    let db = Surreal::new::<Ws>(address).await?;
 
     db.signin(Root {
-        username: "root",
-        password: "root",
+        password: &password,
+        username: &username,
     })
     .await?;
 
-    db.use_ns("test").use_db("ribs").await?;
+    db.use_ns(&namespace).use_db(&database).await?;
 
-    let armors: Vec<ArmorEntity> = db.select("armors").await?;
-
-    return Ok(armors);
+    return Ok(db);
 }
 
-pub async fn add_armor(entity: &ArmorEntity) -> surrealdb::Result<ArmorEntity>{
-    let db = Surreal::new::<Ws>("127.0.0.1:8000").await?;
+fn env_or_default<'a>(key: &'a str, default: &'a str) -> String {
+    let env_opt_val = env::var(key);
 
-    db.signin(Root {
-        username: "root",
-        password: "root",
-    })
-    .await?;
-
-    db.use_ns("test").use_db("ribs").await?;
-
-    let new_armor = db
-    .create(("armors", entity.armor_id.clone()))
-    .content(entity)
-    .await?;
-
-    return Ok(new_armor);
+    match env_opt_val {
+        Ok(val) => val,
+        Err(_) => default.to_owned(),
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn foo(){
-        let foo = get_all_armors();
-    }
 }

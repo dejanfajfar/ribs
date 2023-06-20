@@ -1,43 +1,65 @@
-use rocket::serde::json::Json;
+use rocket::{http::Status, serde::json::Json};
 use serde::Deserialize;
-use surrealdb::sql::Thing;
-use uuid;
 
-use crate::storage::{*, self, entities::ArmorEntity};
+use crate::storage::armor_store::{ArmorEntity, ArmorEntityRecord};
+
+use super::ApiResponse;
 
 #[derive(Deserialize)]
-#[serde(crate = "rocket::serde")]
 pub struct CreateArmorMessage<'r> {
     pub name: &'r str,
     pub reduction: i16,
     pub allow_heal: bool,
 }
 
-#[get("/")]
-pub async fn get_all() -> String {
-    let armors: Result<Vec<ArmorEntity>, surrealdb::Error> =  get_all_armors().await;
-
-    match armors {
-        Ok(a) => serde_json::to_string(&a).unwrap(),
-        Err(e) => e.to_string()
+impl From<Json<CreateArmorMessage<'_>>> for ArmorEntity {
+    fn from(value: Json<CreateArmorMessage<'_>>) -> Self {
+        ArmorEntity {
+            name: String::from(value.name),
+            reduction: value.reduction,
+            allow_heal: value.allow_heal,
+        }
     }
 }
 
-#[post("/", data = "<create_armor_message>")]
-pub async fn post_armor(create_armor_message: Json<CreateArmorMessage<'_>>) -> String {
+#[get("/")]
+pub async fn get_all() -> Json<Vec<ArmorEntityRecord>> {
+    let armors = ArmorEntity::get_all().await;
 
-    let new_entity = ArmorEntity {
-        armor_id: uuid::Uuid::new_v4().to_string(),
-        allow_heal: create_armor_message.allow_heal,
-        reduction: create_armor_message.reduction,
-        name: String::from(create_armor_message.name)
-    };
+    match armors {
+        Ok(a) => Json(a),
+        Err(_) => Json(vec![]),
+    }
+}
 
-
-    let new_armor = add_armor(&new_entity).await;
+#[post("/", format = "json", data = "<new_armor>")]
+pub async fn create_armor(new_armor: Json<CreateArmorMessage<'_>>) -> ApiResponse {
+    let new_armor = ArmorEntity::add(ArmorEntity::from(new_armor)).await;
 
     match new_armor {
-        Ok(a) => serde_json::to_string_pretty(&a).unwrap(),
-        Err(e) => e.to_string(),
+        Ok(a) => ApiResponse {
+            json: serde_json::to_string(&a).unwrap(),
+            status: Status::Ok,
+        },
+        Err(e) => ApiResponse {
+            json: e.to_string(),
+            status: Status::BadRequest,
+        },
+    }
+}
+
+#[post("/<id>", format = "json", data = "<armor>")]
+pub async fn update_armor(id: &str, armor: Json<CreateArmorMessage<'_>>) -> ApiResponse {
+    let updated_armor = ArmorEntity::update(id, ArmorEntity::from(armor)).await;
+
+    match updated_armor {
+        Ok(a) => ApiResponse {
+            json: serde_json::to_string(&a).unwrap(),
+            status: Status::Ok,
+        },
+        Err(e) => ApiResponse {
+            json: e.to_string(),
+            status: Status::BadRequest,
+        },
     }
 }
