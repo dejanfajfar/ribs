@@ -1,4 +1,5 @@
 use rocket::Config;
+use storage::middleware::DbMiddleware;
 
 #[macro_use] extern crate rocket;
 
@@ -11,7 +12,7 @@ fn rocket() -> _ {
     rocket::build()
     .mount("/", routes![api::index])
     .mount("/battlefields", routes![api::battlefield::get_battlefield])
-    .mount("/armors", routes![api::armor::get_all, api::armor::create_armor, api::armor::update_armor])
+    .mount("/armors", routes![api::armor::get_all, api::armor::create_armor, api::armor::update_armor]).attach(DbMiddleware)
     .configure(Config {
         port: 7777,
         ..Config::debug_default()

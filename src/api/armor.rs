@@ -1,5 +1,6 @@
-use rocket::{http::Status, serde::json::Json};
+use rocket::{http::Status, serde::json::Json, State};
 use serde::Deserialize;
+use surrealdb::{Surreal, engine::remote::ws::Client};
 
 use crate::storage::armor_store::{ArmorEntity, ArmorEntityRecord};
 
@@ -23,8 +24,8 @@ impl From<Json<CreateArmorMessage<'_>>> for ArmorEntity {
 }
 
 #[get("/")]
-pub async fn get_all() -> Json<Vec<ArmorEntityRecord>> {
-    let armors = ArmorEntity::get_all().await;
+pub async fn get_all(db: &State<Surreal<Client>>) -> Json<Vec<ArmorEntityRecord>> {
+    let armors: Result<Vec<ArmorEntityRecord>, surrealdb::Error> = ArmorEntity::get_all(db.inner()).await;
 
     match armors {
         Ok(a) => Json(a),
@@ -33,8 +34,8 @@ pub async fn get_all() -> Json<Vec<ArmorEntityRecord>> {
 }
 
 #[post("/", format = "json", data = "<new_armor>")]
-pub async fn create_armor(new_armor: Json<CreateArmorMessage<'_>>) -> ApiResponse {
-    let new_armor = ArmorEntity::add(ArmorEntity::from(new_armor)).await;
+pub async fn create_armor(new_armor: Json<CreateArmorMessage<'_>>, db: &State<Surreal<Client>>) -> ApiResponse {
+    let new_armor: Result<ArmorEntityRecord, surrealdb::Error> = ArmorEntity::add(ArmorEntity::from(new_armor), db.inner()).await;
 
     match new_armor {
         Ok(a) => ApiResponse {
@@ -49,8 +50,8 @@ pub async fn create_armor(new_armor: Json<CreateArmorMessage<'_>>) -> ApiRespons
 }
 
 #[post("/<id>", format = "json", data = "<armor>")]
-pub async fn update_armor(id: &str, armor: Json<CreateArmorMessage<'_>>) -> ApiResponse {
-    let updated_armor = ArmorEntity::update(id, ArmorEntity::from(armor)).await;
+pub async fn update_armor(id: &str, armor: Json<CreateArmorMessage<'_>>, db: &State<Surreal<Client>>) -> ApiResponse {
+    let updated_armor: Result<ArmorEntityRecord, surrealdb::Error> = ArmorEntity::update(id, ArmorEntity::from(armor), db.inner()).await;
 
     match updated_armor {
         Ok(a) => ApiResponse {

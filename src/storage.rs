@@ -1,4 +1,5 @@
 pub mod armor_store;
+pub mod middleware;
 
 use rocket::data;
 use std::env;

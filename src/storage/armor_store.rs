@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use surrealdb::sql::Thing;
+use surrealdb::{sql::Thing, Surreal, engine::remote::ws::Client};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ArmorEntity {
@@ -17,29 +17,22 @@ pub struct ArmorEntityRecord {
 }
 
 impl ArmorEntity {
-    pub async fn get_all() -> surrealdb::Result<Vec<ArmorEntityRecord>> {
-        let db = super::connect_to_db().await?;
+    pub async fn get_all(db: &Surreal<Client>) -> surrealdb::Result<Vec<ArmorEntityRecord>> {
 
         let armors: Vec<ArmorEntityRecord> = db.select("armors").await?;
 
         return Ok(armors);
     }
 
-    pub async fn add(entity: ArmorEntity) -> surrealdb::Result<ArmorEntityRecord> {
-        let db = super::connect_to_db().await?;
-
-        let new_armor: ArmorEntityRecord = db
-            .create("armors")
+    pub async fn add(entity: ArmorEntity, db: &Surreal<Client>) -> surrealdb::Result<ArmorEntityRecord> {let new_armor: ArmorEntityRecord = db
+            .create(("armors", entity.name.clone()))
             .content(entity)
             .await?;
 
         return Ok(new_armor);
     }
 
-    pub async fn update(id : &str, entity: ArmorEntity) -> surrealdb::Result<ArmorEntityRecord> {
-        let db = super::connect_to_db().await?;
-
-        let updated_armor = db.update(("armors", id))
+    pub async fn update(id : &str, entity: ArmorEntity, db: &Surreal<Client>) -> surrealdb::Result<ArmorEntityRecord> {let updated_armor = db.update(("armors", id))
         .content(entity)
         .await?;
 
