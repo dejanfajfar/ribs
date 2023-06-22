@@ -45,4 +45,6 @@ COPY --from=builder /ribs/target/x86_64-unknown-linux-musl/release/ribs ./
 
 USER ribs_user:ribs_user
 
+EXPOSE 7777
+
 CMD ["/ribs/ribs"]

@@ -1,3 +1,20 @@
 services:
   database:
-    image: "surrealdb/surrealdb:latest"
+    image: "surrealdb/surrealdb:latest" 
+    command: start --log trace --user root --pass root memory
+  
+  api:
+    build:
+      context: .
+      labels:
+        - "ribs:latest"
+    ports:
+      - 7777:7777
+    expose:
+      - 7777
+    depends_on:
+      - database
+    environment:
+      RUST_BACKTRACE : 1
+      db_namespace : test
+      db_address : database:8000
