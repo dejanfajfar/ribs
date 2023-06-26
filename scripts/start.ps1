@@ -32,23 +32,14 @@ function Start-Test {
     docker compose  -f .\..\docker-compose.yml up
 }
 
-function Write-Header {
-    param (
-        [string]
-        $text
-    )
-    
+function private:Write-Header([string]$text) {
     '*' * 80
     "{0,49}" -f $text
     '*' * 80
 }
 
-function Write-Warning {
-    param (
-        [string]
-        $text
-    )
-    
+function private:Write-Warning([string]$text) {
+    '`a' # ring the terminal bell -> https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_special_characters?view=powershell-7.3
     '!' * 80
     "{0,49}" -f $text
     '!' * 80
