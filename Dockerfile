@@ -35,6 +35,11 @@ RUN cargo build --target x86_64-unknown-linux-musl --release
 ###############################################################################
 FROM alpine
 
+LABEL Maintainer="dejan@fajfar.com"
+LABEL Product="RIBS"
+
+ENV RUST_BACKTRACE=full
+
 WORKDIR /ribs
 
 # Import from builder
@@ -45,6 +50,7 @@ COPY --from=builder /ribs/target/x86_64-unknown-linux-musl/release/ribs ./
 
 USER ribs_user:ribs_user
 
-EXPOSE 7777
+EXPOSE 7777/tcp
+EXPOSE 7777/udp
 
 CMD ["/ribs/ribs"]

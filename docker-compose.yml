@@ -9,12 +9,11 @@ services:
       labels:
         - "ribs:latest"
     ports:
-      - 7777:7777
-    expose:
-      - 7777
+      - 7777:7777/tcp
+      - 7777:7777/udp
     depends_on:
       - database
     environment:
-      RUST_BACKTRACE : 1
+      RUST_BACKTRACE : full
       db_namespace : test
       db_address : database:8000

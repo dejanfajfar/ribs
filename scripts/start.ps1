@@ -29,16 +29,22 @@ function Start-Development {
 function Start-Test {
     Write-Header "Starting Test Environment"
 
-    docker compose  -f .\..\docker-compose.yml up
+    docker compose  -f $PSScriptRoot\..\docker-compose.yml up
 }
 
-function private:Write-Header([string]$text) {
+function local:Write-Header {
+    param (
+        [string]$text
+    )
     '*' * 80
     "{0,49}" -f $text
     '*' * 80
 }
 
-function private:Write-Warning([string]$text) {
+function local:Write-Warning {
+    param (
+        [string]$text
+    )
     '`a' # ring the terminal bell -> https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_special_characters?view=powershell-7.3
     '!' * 80
     "{0,49}" -f $text
