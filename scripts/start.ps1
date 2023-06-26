@@ -6,6 +6,10 @@
     The environment for which the start command should be execuded.
     
     Default "DEV" is assumed
+.NOTES
+    The folowing error codes are returned in case of an error:
+    - -1 -> Docker not found on the system
+    - -2 -> The provided environment identifier is invalid
 #>
 [CmdletBinding()]
 param (
@@ -30,6 +34,7 @@ function Start-Test {
 
 function Write-Header {
     param (
+        [string]
         $text
     )
     
@@ -40,6 +45,7 @@ function Write-Header {
 
 function Write-Warning {
     param (
+        [string]
         $text
     )
     
@@ -48,11 +54,13 @@ function Write-Warning {
     '!' * 80
 }
 
+# Determine if docker is installed on the system
+# For this we call the docker version command and ignore the output
+# After that we take a look at the exit code of the last command run and expect it to not be an error
 docker version | Out-Null
-
 if (!$?){
     Write-Warning "Docker not installed"
-    Exit -5
+    Exit -1
 }
 
 
@@ -60,7 +68,7 @@ switch ($environment.ToLower()) {
     "dev" { Start-Development }
     "test" { Start-Test }
     Default {
-        Write-Warning "Environment $environment is not valid"
-        Exit -1
+        Write-Warning "Environment $environment is not known...Valid values are: dev, test"
+        Exit -2
     }
 }
