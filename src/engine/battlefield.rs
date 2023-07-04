@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use super::damage::Damage;
 use super::player::Player;
+use crate::types::skillpoint::*;
 
 #[derive(Serialize, Deserialize)]
 pub struct BattleField {

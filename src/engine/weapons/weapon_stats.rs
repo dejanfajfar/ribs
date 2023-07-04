@@ -6,7 +6,7 @@ use crate::engine::damage::Damage;
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct WeaponStats {
     pub name: String,
-    pub base_damage: u16,
+    pub base_damage: u16
 }
 
 impl WeaponStats {

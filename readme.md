@@ -24,14 +24,12 @@ RRRRRRRR     RRRRRRR ...... IIIIIIIIII ...... BBBBBBBBBBBBBBBBB    ......  SSSSS
 ---
 
 
-> My personal atempt at a simble AFK battle system. 
+> My personal attempt at a simple battle system
 
 
 # Introduction
 
-I like learning by doing and in order to learn something I need to apply it to some rel project nut just another tutorial application.
-
-So I tried doing a simple battle system that is slowly growing
+I like learning thing while doing something with them. So this is my attempt at learning RUST.
 
 # Installation
 

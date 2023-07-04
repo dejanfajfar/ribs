@@ -1,4 +1,5 @@
 pub mod armor_store;
+pub mod weapon_store;
 pub mod middleware;
 
 use rocket::data;

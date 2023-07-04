@@ -3,9 +3,10 @@ use serde::{Deserialize, Serialize};
 use super::{
     armor::{Armor, DmgReduction},
     damage::Damage,
-    skills::Skills,
     weapons::{DmgDealer, Weapon},
 };
+
+use crate::types::skills::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Player {

@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-use crate::engine::{damage::Damage, skills::Skills};
+use crate::engine::{damage::Damage};
+use crate::types::skills::*;
 
 use super::{weapon_stats::WeaponStats, DmgDealer};
 

@@ -1,10 +1,8 @@
-pub mod skillpoint;
-
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 
 use rand::{thread_rng, Rng};
-use skillpoint::*;
+use crate::types::skillpoint::*;
 
 #[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
 pub struct Skills {

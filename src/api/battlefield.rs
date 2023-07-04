@@ -2,9 +2,10 @@ use crate::engine::{
     armor::Armor,
     battlefield::BattleField,
     player::Player,
-    skills::SkillsFactory,
     weapons::{blades::BladeFactory, guns::GunFactory, Weapon},
 };
+
+use crate::types::skills::*;
 
 #[get("/")]
 pub fn get_battlefield() -> String {

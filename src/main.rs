@@ -10,6 +10,7 @@ mod configuration;
 mod engine;
 mod api;
 mod storage;
+mod types;
 
 #[launch]
 fn rocket() -> _ {

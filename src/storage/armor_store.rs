@@ -24,7 +24,8 @@ impl ArmorEntity {
         return Ok(armors);
     }
 
-    pub async fn add(entity: ArmorEntity, db: &Surreal<Client>) -> surrealdb::Result<ArmorEntityRecord> {let new_armor: ArmorEntityRecord = db
+    pub async fn add(entity: ArmorEntity, db: &Surreal<Client>) -> surrealdb::Result<ArmorEntityRecord> {
+        let new_armor: ArmorEntityRecord = db
             .create(("armors", entity.name.clone()))
             .content(entity)
             .await?;
@@ -32,9 +33,10 @@ impl ArmorEntity {
         return Ok(new_armor);
     }
 
-    pub async fn update(id : &str, entity: ArmorEntity, db: &Surreal<Client>) -> surrealdb::Result<ArmorEntityRecord> {let updated_armor = db.update(("armors", id))
-        .content(entity)
-        .await?;
+    pub async fn update(id : &str, entity: ArmorEntity, db: &Surreal<Client>) -> surrealdb::Result<ArmorEntityRecord> {
+        let updated_armor = db.update(("armors", id))
+            .content(entity)
+            .await?;
 
         return Ok(updated_armor);
     }

@@ -9,7 +9,7 @@ use self::guns::Gun;
 use self::weapon_stats::WeaponStats;
 
 use super::damage::Damage;
-use super::skills::Skills;
+use crate::types::skills::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Weapon {
