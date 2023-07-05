@@ -4,7 +4,7 @@ use rocket::http::{ContentType, Status};
 
 pub mod battlefield;
 pub mod armor;
-pub mod weapons;
+pub mod combatant;
 
 #[derive(Debug)]
 pub struct ApiResponse {

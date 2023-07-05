@@ -27,3 +27,8 @@ X ! ! ! X X
 X ! ! ! X X
 X X ! X X X
 </pre>
+
+
+https://stackoverflow.com/questions/2311486/how-to-calculate-the-shortest-path-between-two-points-in-a-grid
+
+Dijkstra's algorithm

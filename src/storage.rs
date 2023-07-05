@@ -1,6 +1,7 @@
 pub mod armor_store;
 pub mod weapon_store;
 pub mod middleware;
+pub mod combatants;
 
 use rocket::data;
 use std::env;
