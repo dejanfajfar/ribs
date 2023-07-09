@@ -1,40 +1,76 @@
 pub mod armor_store;
-pub mod weapon_store;
-pub mod middleware;
 pub mod combatants;
+pub mod middleware;
+pub mod weapon_store;
 
-use rocket::data;
-use std::env;
-use surrealdb::engine::remote::ws::{Client, Ws};
-use surrealdb::opt::auth::{Database, Root};
+use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
+use surrealdb::engine::remote::ws::Client;
 use surrealdb::Surreal;
+use surrealdb::sql::Id;
 
-pub async fn connect_to_db<'a>() -> surrealdb::Result<Surreal<Client>> {
-    let address = env_or_default("db_address", "127.0.0.1:8000");
-    let username = env_or_default("db_username", "root");
-    let password = env_or_default("db_password", "root");
-    let namespace = env_or_default("db_namespace", "development");
-    let database = env_or_default("db_name", "ribs");
-
-    let db = Surreal::new::<Ws>(address).await?;
-
-    db.signin(Root {
-        password: &password,
-        username: &username,
-    })
-    .await?;
-
-    db.use_ns(&namespace).use_db(&database).await?;
-
-    return Ok(db);
+pub struct GenericEntity<'a> {
+    db_connection: &'a Surreal<Client>,
+    collection_name: String,
 }
 
-fn env_or_default<'a>(key: &'a str, default: &'a str) -> String {
-    let env_opt_val = env::var(key);
+trait Entity: DeserializeOwned + Serialize + std::marker::Send + std::marker::Sync {}
 
-    match env_opt_val {
-        Ok(val) => val,
-        Err(_) => default.to_owned(),
+pub trait Record<TEntity: Entity>:
+    DeserializeOwned + std::marker::Send + std::marker::Sync
+{
+    fn get_id(&self) -> String;
+    fn get_entity(&self) -> &TEntity;
+}
+
+impl<'a> GenericEntity<'a> {
+    pub fn new(db: &'a Surreal<Client>, collection: &'a str) -> Self {
+        GenericEntity {
+            db_connection: db,
+            collection_name: collection.to_owned(),
+        }
+    }
+
+    pub async fn get_all<TEntity, TRecord>(&self) -> surrealdb::Result<Vec<TRecord>>
+    where
+        TEntity: Entity,
+        TRecord: Record<TEntity>,
+    {
+        return self
+            .db_connection
+            .select(self.collection_name.clone())
+            .await;
+    }
+
+    pub async fn create_new<TEntity, TRecord>(
+        &self,
+        entity: TEntity,
+    ) -> surrealdb::Result<TRecord>
+    where
+        TEntity: Entity,
+        TRecord: Record<TEntity>,
+    {
+        return self
+            .db_connection
+            .create(self.collection_name.clone())
+            .content(entity)
+            .await;
+    }
+
+    pub async fn update<TEntity, TRecord>(
+        &self,
+        id: &str,
+        entity: TEntity,
+    ) -> surrealdb::Result<TRecord>
+    where
+        TEntity: Entity,
+        TRecord: Record<TEntity>,
+    {
+        return self
+            .db_connection
+            .update((self.collection_name.clone(), id))
+            .content(entity)
+            .await;
     }
 }
 

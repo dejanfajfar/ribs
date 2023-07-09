@@ -62,7 +62,7 @@ impl Fairing for DbMiddleware {
 
         let db_config: DbConfig = DbConfig::default();
 
-        let db = Surreal::new::<Ws>(db_config.address).await.unwrap();
+        let db: Surreal<Client> = Surreal::new::<Ws>(db_config.address).await.unwrap();
 
         db.signin(Root {
             password: &db_config.pass,

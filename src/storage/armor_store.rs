@@ -18,10 +18,7 @@ pub struct ArmorEntityRecord {
 
 impl ArmorEntity {
     pub async fn get_all(db: &Surreal<Client>) -> surrealdb::Result<Vec<ArmorEntityRecord>> {
-
-        let armors: Vec<ArmorEntityRecord> = db.select("armors").await?;
-
-        return Ok(armors);
+        return db.select("armors").await;
     }
 
     pub async fn add(entity: ArmorEntity, db: &Surreal<Client>) -> surrealdb::Result<ArmorEntityRecord> {

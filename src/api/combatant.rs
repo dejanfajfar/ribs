@@ -1,4 +1,4 @@
-use crate::storage::combatants::*;
+use crate::storage::{combatants::{*, self}, GenericEntity};
 use rocket::{http::Status, serde::json::Json, State};
 use serde::{Deserialize, Serialize};
 use surrealdb::{engine::remote::ws::Client, Surreal};
@@ -23,10 +23,10 @@ pub struct CombatantContract {
 impl From<CombatantRecord> for CombatantContract {
     fn from(value: CombatantRecord) -> Self {
         CombatantContract {
-            name: value.name.clone(),
+            name: value.entity.name.clone(),
             id: value.id.id.to_string(),
-            hp: value.hit_points,
-            dmg: value.damage_rating,
+            hp: value.entity.hit_points,
+            dmg: value.entity.damage_rating,
         }
     }
 }
@@ -43,8 +43,9 @@ impl From<Json<CreateCombatantContract>> for CombatantEntity {
 
 #[get("/")]
 pub async fn get_all(db: &State<Surreal<Client>>) -> Json<Vec<CombatantContract>> {
+    let db_access: GenericEntity<'_> = GenericEntity::new(db.inner(), combatants::COLLECTION_NAME);
     let all_combatants: Result<Vec<CombatantRecord>, surrealdb::Error> =
-        CombatantEntity::get_all(db).await;
+        db_access.get_all().await;
 
     match all_combatants {
         Ok(c) => {
@@ -64,8 +65,9 @@ pub async fn create_new(
     combatant_post_data: Json<CreateCombatantContract>,
     db: &State<Surreal<Client>>,
 ) -> ApiResponse {
+    let db_access: GenericEntity<'_> = GenericEntity::new(db.inner(), combatants::COLLECTION_NAME);
     let combatants: Result<CombatantRecord, surrealdb::Error> =
-        CombatantEntity::crate_new(db, CombatantEntity::from(combatant_post_data)).await;
+        db_access.create_new(CombatantEntity::from(combatant_post_data)).await;
 
     match combatants {
         Ok(c) => ApiResponse {
@@ -78,3 +80,21 @@ pub async fn create_new(
         },
     }
 }
+
+//#[post("/<id>", format = "json", data = "<combatant_post_data>")]
+//pub async fn update(
+//    id: &str,
+//    combatant_post_data: Json<CreateCombatantContract>,
+//    db: &State<Surreal<Client>>) -> ApiResponse {
+//        let updated_combatant: Result<CombatantRecord, surrealdb::Error> = CombatantEntity::update(db, id, combatant_post_data).await;//
+//        match updated_combatant{
+//            Ok(c) => ApiResponse{
+//                json: serde_json::to_string(&c).unwrap(),
+//                status: Status::Ok
+//            },
+//            Err(e) => ApiResponse {
+//                json: e.to_string(),
+//                status: Status::BadRequest,
+//            },
+//        }
+//    }
