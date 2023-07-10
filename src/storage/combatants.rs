@@ -1,7 +1,7 @@
-use serde::{Deserialize, Serialize};
+use serde::{de::Visitor, Deserialize, Serialize};
 use surrealdb::{engine::remote::ws::Client, sql::Thing, Surreal};
 
-use super::{Record, Entity};
+use super::{Entity, Record};
 
 pub const COLLECTION_NAME: &'static str = "Combatants";
 
@@ -12,12 +12,18 @@ pub struct CombatantEntity {
     pub hit_points: u16,
 }
 
-impl Entity for CombatantEntity{}
+impl Entity for CombatantEntity {
+    fn collection_name() -> &'static str {
+        COLLECTION_NAME
+    }
+}
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CombatantRecord {
     pub id: Thing,
-    pub entity: CombatantEntity
+    pub name: String,
+    pub damage_rating: u16,
+    pub hit_points: u16,
 }
 
 impl Record<CombatantEntity> for CombatantRecord {
@@ -25,9 +31,11 @@ impl Record<CombatantEntity> for CombatantRecord {
         self.id.id.to_raw()
     }
 
-    fn get_entity(&self) -> &CombatantEntity {
-        &self.entity
+    fn get_entity(&self) -> CombatantEntity {
+        CombatantEntity {
+            name: self.name.clone(),
+            damage_rating: self.damage_rating,
+            hit_points: self.hit_points,
+        }
     }
 }
-
-// ToDo: Implement visitor for CombatantEntitiy => https://serde.rs/impl-deserialize.html#the-visitor-trait

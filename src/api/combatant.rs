@@ -1,38 +1,34 @@
-use crate::storage::{combatants::{*, self}, GenericEntity};
-use rocket::{http::Status, serde::json::Json, State};
+use crate::storage::{
+    combatants::*, Record,
+};
+use rocket::{serde::json::Json, State};
 use serde::{Deserialize, Serialize};
 use surrealdb::{engine::remote::ws::Client, Surreal};
 
-use super::ApiResponse;
-
-#[derive(Deserialize)]
-pub struct CreateCombatantContract {
-    pub name: String,
-    pub hp: u16,
-    pub dmg: u16,
-}
+use super::{ApiResponse, CrudApiScaffold};
 
 #[derive(Deserialize, Serialize)]
 pub struct CombatantContract {
     pub name: String,
-    pub id: String,
+    pub id: Option<String>,
     pub hp: u16,
     pub dmg: u16,
 }
 
-impl From<CombatantRecord> for CombatantContract {
-    fn from(value: CombatantRecord) -> Self {
+impl From<&CombatantRecord> for CombatantContract {
+    fn from(value: &CombatantRecord) -> Self {
+        let entity: CombatantEntity = value.get_entity();
         CombatantContract {
-            name: value.entity.name.clone(),
-            id: value.id.id.to_string(),
-            hp: value.entity.hit_points,
-            dmg: value.entity.damage_rating,
+            name: entity.name.clone(),
+            id: Some(value.get_id()),
+            hp: entity.hit_points,
+            dmg: entity.damage_rating,
         }
     }
 }
 
-impl From<Json<CreateCombatantContract>> for CombatantEntity {
-    fn from(value: Json<CreateCombatantContract>) -> Self {
+impl From<Json<CombatantContract>> for CombatantEntity {
+    fn from(value: Json<CombatantContract>) -> Self {
         CombatantEntity {
             name: value.name.clone(),
             damage_rating: value.dmg,
@@ -43,42 +39,33 @@ impl From<Json<CreateCombatantContract>> for CombatantEntity {
 
 #[get("/")]
 pub async fn get_all(db: &State<Surreal<Client>>) -> Json<Vec<CombatantContract>> {
-    let db_access: GenericEntity<'_> = GenericEntity::new(db.inner(), combatants::COLLECTION_NAME);
-    let all_combatants: Result<Vec<CombatantRecord>, surrealdb::Error> =
-        db_access.get_all().await;
+    let all_combatants: Vec<CombatantRecord> =
+        CrudApiScaffold::get_all::<CombatantEntity, CombatantRecord>(db).await;
 
-    match all_combatants {
-        Ok(c) => {
-            let mut ret_val = vec![];
-            for cc in c {
-                ret_val.push(CombatantContract::from(cc));
-            }
-
-            return Json(ret_val);
-        }
-        Err(_) => Json(vec![]),
-    }
+    return Json(Vec::from_iter(
+        all_combatants
+            .iter()
+            .map(|record: &CombatantRecord| CombatantContract::from(record)),
+    ));
 }
 
 #[post("/", format = "json", data = "<combatant_post_data>")]
 pub async fn create_new(
-    combatant_post_data: Json<CreateCombatantContract>,
+    combatant_post_data: Json<CombatantContract>,
     db: &State<Surreal<Client>>,
 ) -> ApiResponse {
-    let db_access: GenericEntity<'_> = GenericEntity::new(db.inner(), combatants::COLLECTION_NAME);
-    let combatants: Result<CombatantRecord, surrealdb::Error> =
-        db_access.create_new(CombatantEntity::from(combatant_post_data)).await;
+    let entity: CombatantEntity = CombatantEntity::from(combatant_post_data);
+    return CrudApiScaffold::create_new(db, entity, |record: CombatantRecord| CombatantContract::from(&record) ).await;
+}
 
-    match combatants {
-        Ok(c) => ApiResponse {
-            json: serde_json::to_string(&c).unwrap(),
-            status: Status::Ok,
-        },
-        Err(e) => ApiResponse {
-            json: e.to_string(),
-            status: Status::BadRequest,
-        },
-    }
+#[put("/<id>", format = "json", data = "<post_data>")]
+pub async fn update(
+    id: &str,
+    post_data: Json<CombatantContract>,
+    db: &State<Surreal<Client>>
+) -> ApiResponse {
+    let entity: CombatantEntity = CombatantEntity::from(post_data);
+    return CrudApiScaffold::update(db, id, entity, |record: CombatantRecord| CombatantContract::from(&record) ).await;
 }
 
 //#[post("/<id>", format = "json", data = "<combatant_post_data>")]

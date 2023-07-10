@@ -2,32 +2,35 @@ pub mod armor_store;
 pub mod combatants;
 pub mod middleware;
 pub mod weapon_store;
+pub mod battlefields;
 
 use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::Surreal;
-use surrealdb::sql::Id;
 
 pub struct GenericEntity<'a> {
     db_connection: &'a Surreal<Client>,
     collection_name: String,
 }
 
-trait Entity: DeserializeOwned + Serialize + std::marker::Send + std::marker::Sync {}
+pub trait Entity: DeserializeOwned + Serialize + std::marker::Send + std::marker::Sync {
+    fn collection_name() -> &'static str;
+}
 
 pub trait Record<TEntity: Entity>:
     DeserializeOwned + std::marker::Send + std::marker::Sync
 {
     fn get_id(&self) -> String;
-    fn get_entity(&self) -> &TEntity;
+    fn get_entity(&self) -> TEntity;
 }
 
 impl<'a> GenericEntity<'a> {
-    pub fn new(db: &'a Surreal<Client>, collection: &'a str) -> Self {
+    pub fn new<TEntity>(db: &'a Surreal<Client>) -> Self
+    where TEntity: Entity {
         GenericEntity {
             db_connection: db,
-            collection_name: collection.to_owned(),
+            collection_name: TEntity::collection_name().to_owned(),
         }
     }
 
