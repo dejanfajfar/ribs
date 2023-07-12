@@ -1,8 +1,8 @@
 pub mod armor_store;
+pub mod battlefields;
 pub mod combatants;
 pub mod middleware;
 pub mod weapon_store;
-pub mod battlefields;
 
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -27,7 +27,9 @@ pub trait Record<TEntity: Entity>:
 
 impl<'a> GenericEntity<'a> {
     pub fn new<TEntity>(db: &'a Surreal<Client>) -> Self
-    where TEntity: Entity {
+    where
+        TEntity: Entity,
+    {
         GenericEntity {
             db_connection: db,
             collection_name: TEntity::collection_name().to_owned(),
@@ -45,10 +47,7 @@ impl<'a> GenericEntity<'a> {
             .await;
     }
 
-    pub async fn create_new<TEntity, TRecord>(
-        &self,
-        entity: TEntity,
-    ) -> surrealdb::Result<TRecord>
+    pub async fn create_new<TEntity, TRecord>(&self, entity: TEntity) -> surrealdb::Result<TRecord>
     where
         TEntity: Entity,
         TRecord: Record<TEntity>,
@@ -73,6 +72,28 @@ impl<'a> GenericEntity<'a> {
             .db_connection
             .update((self.collection_name.clone(), id))
             .content(entity)
+            .await;
+    }
+
+    pub async fn get_by_id<TEntity, TRecord>(&self, id: &str) -> surrealdb::Result<TRecord>
+    where
+        TEntity: Entity,
+        TRecord: Record<TEntity>,
+    {
+        return self
+            .db_connection
+            .select((self.collection_name.clone(), id))
+            .await;
+    }
+
+    pub async fn delete<TEntity, TRecord>(&self, id: &str) -> surrealdb::Result<TRecord>
+    where
+        TEntity: Entity,
+        TRecord: Record<TEntity>,
+    {
+        return self
+            .db_connection
+            .delete((self.collection_name.clone(), id))
             .await;
     }
 }

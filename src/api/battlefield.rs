@@ -13,7 +13,7 @@ use super::CrudApiScaffold;
 pub struct BattleFieldContract {
     pub height: u8,
     pub width: u8,
-    pub Id: Option<String>,
+    pub id: Option<String>,
 }
 
 impl From<Json<BattleFieldContract>> for BattleFieldEntity {
@@ -30,7 +30,7 @@ impl From<&BattleFieldRecord> for BattleFieldContract {
         BattleFieldContract {
             height: value.height,
             width: value.width,
-            Id: Some(value.get_id()),
+            id: Some(value.get_id()),
         }
     }
 }
@@ -51,17 +51,39 @@ pub async fn create_new(
     db: &State<Surreal<Client>>,
 ) -> ApiResponse {
     let entity: BattleFieldEntity = BattleFieldEntity::from(post_data);
-    return CrudApiScaffold::create_new(db, entity, |record: BattleFieldRecord| BattleFieldContract::from(&record) ).await;
+    CrudApiScaffold::create_new(db, entity, |record: BattleFieldRecord| {
+        BattleFieldContract::from(&record)
+    })
+    .await
 }
 
 #[put("/<id>", format = "json", data = "<post_data>")]
 pub async fn update(
     id: &str,
     post_data: Json<BattleFieldContract>,
-    db: &State<Surreal<Client>>
+    db: &State<Surreal<Client>>,
 ) -> ApiResponse {
     let entity: BattleFieldEntity = BattleFieldEntity::from(post_data);
-    return CrudApiScaffold::update(db, id, entity, |record: BattleFieldRecord| BattleFieldContract::from(&record) ).await;
+    CrudApiScaffold::update(db, id, entity, |record: BattleFieldRecord| {
+        BattleFieldContract::from(&record)
+    })
+    .await
+}
+
+#[get("/<id>")]
+pub async fn get_by_id(id: &str, db: &State<Surreal<Client>>) -> ApiResponse {
+    CrudApiScaffold::get_by_id(db, id, |record: BattleFieldRecord| {
+        BattleFieldContract::from(&record)
+    })
+    .await
+}
+
+#[delete("/<id>")]
+pub async fn delete(id: &str, db: &State<Surreal<Client>>) -> ApiResponse {
+    CrudApiScaffold::delete(db, id, |record: BattleFieldRecord| {
+        BattleFieldContract::from(&record)
+    })
+    .await
 }
 
 //#[get("/")]

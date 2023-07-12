@@ -20,7 +20,9 @@ fn rocket() -> _ {
             routes![
                 api::battlefield::get_all,
                 api::battlefield::create_new,
-                api::battlefield::update
+                api::battlefield::update,
+                api::battlefield::delete,
+                api::battlefield::get_by_id
             ],
         )
         .mount(
@@ -36,7 +38,9 @@ fn rocket() -> _ {
             routes![
                 api::combatant::get_all,
                 api::combatant::create_new,
-                api::combatant::update
+                api::combatant::update,
+                api::combatant::delete,
+                api::combatant::get_by_id
             ],
         )
         .attach(DbMiddleware)

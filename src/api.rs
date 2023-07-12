@@ -43,6 +43,62 @@ impl CrudApiScaffold {
         }
     }
 
+    pub async fn get_by_id<TEntity, TRecord, TContract>(
+        db: &State<Surreal<Client>>,
+        id: &str,
+        transformation_function: impl Fn(TRecord) -> TContract,
+    ) -> ApiResponse
+    where
+        TEntity: Entity,
+        TRecord: Record<TEntity>,
+        TContract: Serialize,
+    {
+        let db_access: GenericEntity<'_> = GenericEntity::new::<TEntity>(db.inner());
+        let entity: Result<TRecord, surrealdb::Error> = db_access.get_by_id(id).await;
+
+        match entity {
+            Ok(e) => {
+                let contract: TContract = transformation_function(e);
+                ApiResponse {
+                    json: serde_json::to_string(&contract).unwrap(),
+                    status: Status::Ok,
+                }
+            }
+            Err(e) => ApiResponse {
+                json: String::new(),
+                status: Status::NotFound,
+            },
+        }
+    }
+
+    pub async fn delete<TEntity, TRecord, TContract>(
+        db: &State<Surreal<Client>>,
+        id: &str,
+        transformation_function: impl Fn(TRecord) -> TContract,
+    ) -> ApiResponse
+    where
+        TEntity: Entity,
+        TRecord: Record<TEntity>,
+        TContract: Serialize,
+    {
+        let db_access: GenericEntity<'_> = GenericEntity::new::<TEntity>(db.inner());
+        let entity = db_access.delete::<TEntity, TRecord>(id).await;
+
+        match entity {
+            Ok(e) => {
+                let contract: TContract = transformation_function(e);
+                ApiResponse {
+                    json: serde_json::to_string(&contract).unwrap(),
+                    status: Status::Ok,
+                }
+            }
+            Err(e) => ApiResponse {
+                json: e.to_string(),
+                status: Status::BadRequest,
+            },
+        }
+    }
+
     pub async fn create_new<TEntity, TRecord, TContract>(
         db: &State<Surreal<Client>>,
         entity: TEntity,
@@ -89,7 +145,7 @@ impl CrudApiScaffold {
 
         match updated_entity_result {
             Ok(e) => {
-                let contract = transformation_function(e);
+                let contract: TContract = transformation_function(e);
                 ApiResponse {
                     json: serde_json::to_string(&contract).unwrap(),
                     status: Status::Ok,

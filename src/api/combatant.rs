@@ -1,6 +1,4 @@
-use crate::storage::{
-    combatants::*, Record,
-};
+use crate::storage::{combatants::*, Record};
 use rocket::{serde::json::Json, State};
 use serde::{Deserialize, Serialize};
 use surrealdb::{engine::remote::ws::Client, Surreal};
@@ -49,23 +47,49 @@ pub async fn get_all(db: &State<Surreal<Client>>) -> Json<Vec<CombatantContract>
     ));
 }
 
+#[get("/<id>")]
+pub async fn get_by_id(db: &State<Surreal<Client>>, id: &str) -> ApiResponse {
+    return CrudApiScaffold::get_by_id::<CombatantEntity, CombatantRecord, CombatantContract>(
+        db,
+        id,
+        |record: CombatantRecord| CombatantContract::from(&record),
+    )
+    .await;
+}
+
+#[delete("/<id>")]
+pub async fn delete(db: &State<Surreal<Client>>, id: &str) -> ApiResponse {
+    return CrudApiScaffold::delete::<CombatantEntity, CombatantRecord, CombatantContract>(
+        db,
+        id,
+        |record: CombatantRecord| CombatantContract::from(&record),
+    )
+    .await;
+}
+
 #[post("/", format = "json", data = "<combatant_post_data>")]
 pub async fn create_new(
     combatant_post_data: Json<CombatantContract>,
     db: &State<Surreal<Client>>,
 ) -> ApiResponse {
     let entity: CombatantEntity = CombatantEntity::from(combatant_post_data);
-    return CrudApiScaffold::create_new(db, entity, |record: CombatantRecord| CombatantContract::from(&record) ).await;
+    return CrudApiScaffold::create_new(db, entity, |record: CombatantRecord| {
+        CombatantContract::from(&record)
+    })
+    .await;
 }
 
 #[put("/<id>", format = "json", data = "<post_data>")]
 pub async fn update(
     id: &str,
     post_data: Json<CombatantContract>,
-    db: &State<Surreal<Client>>
+    db: &State<Surreal<Client>>,
 ) -> ApiResponse {
     let entity: CombatantEntity = CombatantEntity::from(post_data);
-    return CrudApiScaffold::update(db, id, entity, |record: CombatantRecord| CombatantContract::from(&record) ).await;
+    return CrudApiScaffold::update(db, id, entity, |record: CombatantRecord| {
+        CombatantContract::from(&record)
+    })
+    .await;
 }
 
 //#[post("/<id>", format = "json", data = "<combatant_post_data>")]
