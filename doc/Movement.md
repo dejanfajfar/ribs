@@ -40,6 +40,8 @@ Schematic above represents the movement range.
 4 3 2 3 4 5
 </pre>
 
+# Starting positions
+
 
 
 

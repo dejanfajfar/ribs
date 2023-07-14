@@ -1,175 +1,87 @@
 use std::collections::HashMap;
 
-use chrono::{DateTime, Utc};
-use rand::seq::SliceRandom;
-use rand::{thread_rng, Rng};
-use serde::{Deserialize, Serialize};
+use crate::{
+    storage::{
+        battlefields::BattleFieldRecord,
+        combatants::CombatantRecord,
+        Record,
+    },
+    types::point::Point,
+};
 
-use super::damage::Damage;
-use super::player::Player;
-use crate::types::skillpoint::*;
+use super::err::Error;
 
-#[derive(Serialize, Deserialize)]
-pub struct BattleField {
-    players: HashMap<String, Player>,
+#[derive(Debug)]
+pub struct BattlefieldData {
+    map: BattleFieldMap,
+    combatants: Vec<CombatantRecord>,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct BattleResult {
-    pub start: DateTime<Utc>,
-    pub end: DateTime<Utc>,
-    pub rounds: Vec<BattleRoundResults>,
+#[derive(Debug, Clone)]
+pub struct BattleFieldMap {
+    width: u8,
+    height: u8,
+    combatants_positions: HashMap<String, Point>,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct BattleRoundResults {
-    pub round_num: u16,
-    pub actions: Vec<BattleAction>,
-    pub player_health: HashMap<String, u16>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub enum BattleAction {
-    Attack(AttackAction),
-    None(String),
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct AttackAction {
-    attacker: String,
-    target: String,
-    attack_dmg: i16,
-    dmg_taken: i16,
-    target_hit_points_remaining: u16,
-}
-
-impl AttackAction {
-    pub fn new(
-        attacker: String,
-        target: String,
-        attack_dmg: Option<Damage>,
-        dmg_taken: Damage,
-        target_hit_points_remaining: u16,
-    ) -> AttackAction {
-        match attack_dmg {
-            Some(d) => AttackAction {
-                attacker,
-                target,
-                attack_dmg: d.damage(),
-                dmg_taken: dmg_taken.damage(),
-                target_hit_points_remaining,
-            },
-            None => AttackAction {
-                attacker,
-                target,
-                attack_dmg: 0,
-                dmg_taken: dmg_taken.damage(),
-                target_hit_points_remaining,
-            },
+impl From<BattleFieldRecord> for BattleFieldMap {
+    fn from(value: BattleFieldRecord) -> Self {
+        BattleFieldMap {
+            width: value.width,
+            height: value.height,
+            combatants_positions: HashMap::new(),
         }
     }
 }
 
-impl BattleRoundResults {
-    pub fn new(round_num: u16) -> BattleRoundResults {
-        return BattleRoundResults {
-            round_num: round_num,
-            actions: vec![],
-            player_health: HashMap::default(),
-        };
-    }
-
-    pub fn add_action<'a>(&mut self, action: BattleAction) {
-        self.actions.push(action);
-    }
-
-    pub fn take_player_action(
-        &mut self,
-        mut player: Player,
-        mut targets: Vec<Player>,
-    ) -> (Player, Option<Player>) {
-        let mut rng: rand::rngs::ThreadRng = thread_rng();
-        let target = targets.choose_mut(&mut rng);
-
-        match target {
-            Some(t) => {
-                let player_dmg_output: Option<Damage> = player.attack();
-                let target_dmg: (Damage, u16) = t.apply_damage(player_dmg_output);
-                self.add_action(BattleAction::Attack(AttackAction::new(
-                    player.name(),
-                    t.name(),
-                    player_dmg_output,
-                    target_dmg.0,
-                    target_dmg.1,
-                )));
-                return (player, Some(t.to_owned()));
-            }
-            None => {
-                self.add_action(BattleAction::None(player.name()));
-                return (player, None);
-            }
-        }
-    }
-}
-
-impl BattleField {
-    pub fn add_player(&mut self, player: Player) {
-        self.players.insert(player.name(), player);
-    }
-
-    pub fn start(&mut self) -> BattleResult {
-        let mut loop_guard: i32 = 100;
-        let _start: DateTime<Utc> = Utc::now();
-        let mut _rounds: Vec<BattleRoundResults> = vec![];
-        let mut round_counter: u16 = 1;
-
-        while self.players.iter().take_while(|p| p.1.is_alive()).count() > 1 && loop_guard > 0 {
-            _rounds.push(self.do_round(round_counter));
-            round_counter += 1;
-            loop_guard -= 1;
-        }
-
-        return BattleResult {
-            start: _start,
-            end: Utc::now(),
-            rounds: _rounds,
-        };
-    }
-
-    fn do_round(&mut self, round_num: u16) -> BattleRoundResults {
-        let mut round_result: BattleRoundResults = BattleRoundResults::new(round_num);
-        let mut _instance_players = self.players.clone();
-        for player in _instance_players.iter_mut().take_while(|p| p.1.is_alive()) {
-            let _targets = Vec::from_iter(
-                self.players
-                    .iter()
-                    .take_while(|p| p.1.name() != player.1.name() && p.1.is_alive())
-                    .map(|p| p.1)
-                    .cloned(),
-            );
-            // Attack phase
-            let altered_players = round_result.take_player_action(player.1.to_owned(), _targets);
-
-            self.update_player_state(altered_players.0);
-
-            match altered_players.1 {
-                Some(p) => self.update_player_state(p),
-                None => continue,
-            }
-        }
-
-        return round_result;
-    }
-
-    fn update_player_state(&mut self, player: Player) {
-        self.players.insert(player.name(), player);
-    }
-}
-
-impl Default for BattleField {
-    fn default() -> Self {
+impl Clone for BattlefieldData {
+    fn clone(&self) -> Self {
         Self {
-            players: Default::default(),
+            map: self.map.clone(),
+            combatants: vec![],
         }
+    }
+}
+
+impl BattlefieldData {
+    pub fn add_combatant(&mut self, combatant: CombatantRecord) -> Result<bool, Error> {
+        self.map.place_randomly(combatant.get_id())?;
+        Ok(true)
+    }
+}
+
+impl BattleFieldMap {
+    pub fn place_randomly(&mut self, combatant_id: String) -> Result<bool, Error> {
+        let combatant_position = self.unoccupied_location();
+
+        if self.combatants_positions.contains_key(&combatant_id) {
+            return Err(Error::UserAlreadyOnMap);
+        }
+
+        self.combatants_positions
+            .insert(combatant_id, combatant_position);
+        Ok(true)
+    }
+
+    fn unoccupied_location(&self) -> Point {
+        let mut starting_position: Point = Point::random(Some(Point::new(self.height, self.width)));
+
+        while self.is_occupied(starting_position) {
+            starting_position = Point::random(Some(Point::new(self.height, self.width)));
+        }
+
+        return starting_position;
+    }
+
+    pub fn is_occupied(&self, location: Point) -> bool {
+        return false;
+    }
+
+    pub fn combatant_positions(&self, active_combatant: String) -> (Point, Vec<Point>) {
+        todo!()
+    }
+
+    pub fn map_bounds(&self) -> Point {
+        Point { x: self.width, y: self.height }
     }
 }

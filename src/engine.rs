@@ -1,5 +1,3 @@
-pub mod armor;
 pub mod battlefield;
-pub mod damage;
-pub mod player;
-pub mod weapons;
+pub mod movement;
+pub mod err;
