@@ -1,7 +1,5 @@
 use crate::types::point::Point;
 
-use super::battlefield::BattleFieldMap;
-
 const MOVEMENT_RANGE : u8 = 3;
 
 pub struct MovementEngine;
@@ -17,23 +15,11 @@ impl MovementEngine {
     }
 
     fn calculate_path(start: &Point, goal: &Point) -> Vec<Point> {
-        if (start == goal) {
+        if start == goal {
             return vec![];
         }
 
-        let mut path_matrix: Vec<Vec<Point>> = vec![];
-        for neighbor in start.neighbors(None){
-            path_matrix.push(MovementEngine::find_route(neighbor, &goal, vec![]));
-        }
-
-        let mut shortest_path: (usize, Vec<Point>) = (usize::MAX, vec![]);
-        for foo in path_matrix.iter().map(|pm| (pm.len(), pm.to_vec())).collect::<Vec<(usize, Vec<Point>)>>() {
-            if foo.0 <= shortest_path.0{
-                shortest_path = foo;
-            }
-        }
-
-        return shortest_path.1;
+        return MovementEngine::find_route(start.clone(), &goal, vec![])[1..].to_vec();
     }
 
     fn find_route(start: Point, goal: &Point, path: Vec<Point>) -> Vec<Point>{

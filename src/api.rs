@@ -7,7 +7,6 @@ use surrealdb::{engine::remote::ws::Client, Surreal};
 
 use crate::storage::{Entity, GenericEntity, Record};
 
-pub mod armor;
 pub mod battlefield;
 pub mod combatant;
 

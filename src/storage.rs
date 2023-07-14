@@ -1,8 +1,6 @@
-pub mod armor_store;
 pub mod battlefields;
 pub mod combatants;
 pub mod middleware;
-pub mod weapon_store;
 
 use serde::de::DeserializeOwned;
 use serde::Serialize;
