@@ -1,23 +1,21 @@
 use crate::types::point::Point;
 
-const MOVEMENT_RANGE : usize = 3;
-
 pub struct MovementEngine{
     current_position: Point,
     enemies: Vec<Point>,
-    step_limit: Option<u8>
+    step_limit: Option<usize>
 }
 
 pub struct MovementResult{
     pub start: Point,
     pub goal: Point,
     pub last_position: Point,
-    pub path: Vec<Point>
+    pub steps: Vec<Point>
 }
 
 impl MovementResult {
     pub fn already_at_goal(start: Point, goal: Point) -> Self {
-        MovementResult { start: start, goal: goal, last_position: start, path: vec![] }
+        MovementResult { start: start, goal: goal, last_position: start, steps: vec![] }
     }
 }
 
@@ -31,7 +29,7 @@ impl MovementEngine {
         }
 
         let mut path: Vec<Point> = MovementEngine::find_route(self.current_position.clone(), &movement_goal, vec![])[1..].to_vec();
-        path.truncate(MOVEMENT_RANGE);
+        path.truncate(self.normalized_step_limit());
 
         let destination_reached: Option<Point> = path.to_vec().pop();
 
@@ -39,22 +37,22 @@ impl MovementEngine {
             Some(d) => MovementResult{
                 goal: movement_goal,
                 start: self.current_position,
-                path: path,
+                steps: path,
                 last_position: d
             },
             None => MovementResult{
                 goal: movement_goal,
                 start: self.current_position,
-                path: path,
+                steps: path,
                 last_position: self.current_position
             }
         }
     }
 
-    fn normalized_step_limit(&self) -> u8{
+    fn normalized_step_limit(&self) -> usize{
         match self.step_limit {
             Some(ml) => ml,
-            None => u8::MAX,
+            None => usize::MAX,
         }
     }
 
@@ -95,5 +93,20 @@ mod tests {
         assert_eq!(player, result.start);
         assert_eq!(enemy2, result.goal);
 
+    }
+
+    #[test]
+    fn do_move_target_beyond_reach(){
+        let player = Point::new(3, 3);
+        let enemy1 = Point::new(10, 20);
+
+        let result: MovementResult = MovementEngine{
+            current_position: player,
+            enemies: vec![enemy1],
+            step_limit: Some(3)
+        }.do_move();
+
+        assert_eq!(player, result.start);
+        assert_eq!(enemy1, result.goal);
     }
 }
