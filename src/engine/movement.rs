@@ -1,25 +1,61 @@
 use crate::types::point::Point;
 
-const MOVEMENT_RANGE : u8 = 3;
+const MOVEMENT_RANGE : usize = 3;
 
-pub struct MovementEngine;
+pub struct MovementEngine{
+    current_position: Point,
+    enemies: Vec<Point>,
+    step_limit: Option<u8>
+}
+
+pub struct MovementResult{
+    pub start: Point,
+    pub goal: Point,
+    pub last_position: Point,
+    pub path: Vec<Point>
+}
+
+impl MovementResult {
+    pub fn already_at_goal(start: Point, goal: Point) -> Self {
+        MovementResult { start: start, goal: goal, last_position: start, path: vec![] }
+    }
+}
 
 impl MovementEngine {
-    pub fn do_move(movement_origin: Point, other_players: Vec<Point>) -> Point {
+    pub fn do_move(&self) -> MovementResult {
         // Determine movement target
-        let  movement_target = movement_origin.closest(other_players);
+        let  movement_goal = self.current_position.closest(self.enemies.to_vec());
 
-        let path = MovementEngine::calculate_path(&movement_origin, &movement_target);
-
-        return Point::default();
-    }
-
-    fn calculate_path(start: &Point, goal: &Point) -> Vec<Point> {
-        if start == goal {
-            return vec![];
+        if self.current_position.neighbors(None).contains(&movement_goal) || self.current_position == movement_goal {
+            return MovementResult::already_at_goal(self.current_position, movement_goal);
         }
 
-        return MovementEngine::find_route(start.clone(), &goal, vec![])[1..].to_vec();
+        let mut path: Vec<Point> = MovementEngine::find_route(self.current_position.clone(), &movement_goal, vec![])[1..].to_vec();
+        path.truncate(MOVEMENT_RANGE);
+
+        let destination_reached: Option<Point> = path.to_vec().pop();
+
+        match destination_reached {
+            Some(d) => MovementResult{
+                goal: movement_goal,
+                start: self.current_position,
+                path: path,
+                last_position: d
+            },
+            None => MovementResult{
+                goal: movement_goal,
+                start: self.current_position,
+                path: path,
+                last_position: self.current_position
+            }
+        }
+    }
+
+    fn normalized_step_limit(&self) -> u8{
+        match self.step_limit {
+            Some(ml) => ml,
+            None => u8::MAX,
+        }
     }
 
     fn find_route(start: Point, goal: &Point, path: Vec<Point>) -> Vec<Point>{
@@ -46,8 +82,18 @@ mod tests {
 
     #[test]
     fn find_path(){
-        let result: Vec<Point> = MovementEngine::calculate_path(&Point::new(1, 1), &Point::new(3, 3));
+        let player = Point::new(3, 3);
+        let enemy1 = Point::new(10, 20);
+        let enemy2 = Point::default();
 
-        assert_eq!(result.len(), 3);
+        let result: MovementResult = MovementEngine{
+            current_position: player,
+            enemies: vec![enemy1, enemy2],
+            step_limit: None
+        }.do_move();
+
+        assert_eq!(player, result.start);
+        assert_eq!(enemy2, result.goal);
+
     }
 }
