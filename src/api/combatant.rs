@@ -5,7 +5,7 @@ use surrealdb::{engine::remote::ws::Client, Surreal};
 
 use super::{ApiResponse, CrudApiScaffold};
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct CombatantContract {
     pub name: String,
     pub id: Option<String>,
@@ -21,6 +21,17 @@ impl From<&CombatantRecord> for CombatantContract {
             id: Some(value.get_id()),
             hp: entity.hit_points,
             dmg: entity.damage_rating,
+        }
+    }
+}
+
+impl From<&CombatantEntity> for CombatantContract {
+    fn from(value: &CombatantEntity) -> Self {
+        CombatantContract {
+            name: value.name.clone(),
+            id: None,
+            hp: value.hit_points,
+            dmg: value.damage_rating,
         }
     }
 }

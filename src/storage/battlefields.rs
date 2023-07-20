@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::Thing;
 
-use super::{Entity, Record};
+use super::{Entity, Record, combatants::{CombatantRecord, CombatantEntity}};
 
 pub const COLLECTION_NAME: &'static str = "Battlefields";
 
@@ -9,6 +9,7 @@ pub const COLLECTION_NAME: &'static str = "Battlefields";
 pub struct BattleFieldEntity {
     pub height: u8,
     pub width: u8,
+    pub combatants: Vec<CombatantEntity>
 }
 
 impl Entity for BattleFieldEntity {
@@ -22,6 +23,7 @@ pub struct BattleFieldRecord {
     pub height: u8,
     pub width: u8,
     pub id: Thing,
+    pub combatants: Vec<CombatantEntity>
 }
 
 impl Record<BattleFieldEntity> for BattleFieldRecord {
@@ -33,6 +35,7 @@ impl Record<BattleFieldEntity> for BattleFieldRecord {
         BattleFieldEntity {
             height: self.height,
             width: self.width,
+            combatants: self.combatants.to_vec()
         }
     }
 }

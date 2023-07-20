@@ -38,7 +38,7 @@ impl Clone for BattlefieldData {
     fn clone(&self) -> Self {
         Self {
             map: self.map.clone(),
-            combatants: vec![],
+            combatants: self.combatants.to_vec(),
         }
     }
 }

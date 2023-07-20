@@ -4,16 +4,17 @@ use surrealdb::{engine::remote::ws::Client, Surreal};
 
 use crate::{
     api::ApiResponse,
-    storage::{battlefields::*, Record},
+    storage::{battlefields::*, Record, combatants::CombatantEntity},
 };
 
-use super::CrudApiScaffold;
+use super::{CrudApiScaffold, combatant::CombatantContract};
 
 #[derive(Serialize, Deserialize)]
 pub struct BattleFieldContract {
     pub height: u8,
     pub width: u8,
     pub id: Option<String>,
+    pub combatants: Vec<CombatantContract>
 }
 
 impl From<Json<BattleFieldContract>> for BattleFieldEntity {
@@ -21,6 +22,7 @@ impl From<Json<BattleFieldContract>> for BattleFieldEntity {
         BattleFieldEntity {
             height: value.height,
             width: value.width,
+            combatants: value.combatants.iter().map(|c| CombatantEntity::from(Json(c.clone()))).collect()
         }
     }
 }
@@ -31,6 +33,7 @@ impl From<&BattleFieldRecord> for BattleFieldContract {
             height: value.height,
             width: value.width,
             id: Some(value.get_id()),
+            combatants: value.combatants.iter().map(|c| CombatantContract::from(c)).collect()
         }
     }
 }

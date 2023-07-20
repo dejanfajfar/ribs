@@ -5,7 +5,7 @@ use super::{Entity, Record};
 
 pub const COLLECTION_NAME: &'static str = "Combatants";
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CombatantEntity {
     pub name: String,
     pub damage_rating: u16,
@@ -18,7 +18,7 @@ impl Entity for CombatantEntity {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CombatantRecord {
     pub id: Thing,
     pub name: String,

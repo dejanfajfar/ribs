@@ -9,6 +9,7 @@ use crate::storage::{Entity, GenericEntity, Record};
 
 pub mod battlefield;
 pub mod combatant;
+pub mod battle;
 
 #[derive(Debug)]
 pub struct ApiResponse {

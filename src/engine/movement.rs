@@ -108,5 +108,24 @@ mod tests {
 
         assert_eq!(player, result.start);
         assert_eq!(enemy1, result.goal);
+        assert_eq!(Point::new(3, 6), result.last_position);
+        assert_eq!(3, result.steps.len());
+    }
+
+    #[test]
+    fn do_move_target_closer_than_range(){
+        let player = Point::new(3, 3);
+        let enemy1 = Point::new(10, 20);
+
+        let result: MovementResult = MovementEngine{
+            current_position: player,
+            enemies: vec![enemy1],
+            step_limit: Some(30)
+        }.do_move();
+
+        assert_eq!(player, result.start);
+        assert_eq!(enemy1, result.goal);
+        assert_eq!(Point::new(10, 19), result.last_position);
+        assert_eq!(23, result.steps.len());
     }
 }
