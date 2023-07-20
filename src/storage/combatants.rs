@@ -1,5 +1,5 @@
-use serde::{de::Visitor, Deserialize, Serialize};
-use surrealdb::{engine::remote::ws::Client, sql::Thing, Surreal};
+use serde::{Deserialize, Serialize};
+use surrealdb::{sql::Thing};
 
 use super::{Entity, Record};
 

@@ -73,11 +73,11 @@ impl BattleFieldMap {
         return starting_position;
     }
 
-    pub fn is_occupied(&self, location: Point) -> bool {
+    pub fn is_occupied(&self, _location: Point) -> bool {
         return false;
     }
 
-    pub fn combatant_positions(&self, active_combatant: String) -> (Point, Vec<Point>) {
+    pub fn combatant_positions(&self, _active_combatant: String) -> (Point, Vec<Point>) {
         todo!()
     }
 

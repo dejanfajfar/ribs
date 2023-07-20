@@ -64,7 +64,7 @@ impl CrudApiScaffold {
                     status: Status::Ok,
                 }
             }
-            Err(e) => ApiResponse {
+            Err(_e) => ApiResponse {
                 json: String::new(),
                 status: Status::NotFound,
             },

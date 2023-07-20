@@ -1,4 +1,4 @@
-use std::{default, env};
+use std::{env};
 
 use rocket::{
     fairing::{Fairing, Info, Kind, Result},
@@ -58,7 +58,7 @@ impl Fairing for DbMiddleware {
     }
 
     async fn on_ignite(&self, rocket: Rocket<Build>) -> Result {
-        let figment = rocket.figment().clone();
+        let _figment = rocket.figment().clone();
 
         let db_config: DbConfig = DbConfig::default();
 

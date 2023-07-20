@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::Thing;
 
-use super::{Entity, Record, combatants::{CombatantRecord, CombatantEntity}};
+use super::{Entity, Record, combatants::{CombatantEntity}};
 
 pub const COLLECTION_NAME: &'static str = "Battlefields";
 

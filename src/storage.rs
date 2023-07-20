@@ -98,5 +98,5 @@ impl<'a> GenericEntity<'a> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    
 }
