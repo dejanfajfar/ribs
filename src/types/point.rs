@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use rand::{thread_rng, Rng};
 
-#[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Copy, Eq, Hash)]
 pub struct Point {
     pub x: u8,
     pub y: u8,

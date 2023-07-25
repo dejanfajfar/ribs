@@ -17,6 +17,12 @@ pub struct ApiResponse {
     pub status: Status,
 }
 
+impl ApiResponse {
+    pub fn empty(status: Status) -> Self {
+        ApiResponse { json: String::from(""), status }
+    }
+}
+
 impl<'r> Responder<'r, 'static> for ApiResponse {
     fn respond_to(self, req: &Request) -> response::Result<'static> {
         Response::build_from(self.json.respond_to(&req).unwrap())
