@@ -23,6 +23,10 @@ impl MovementResult {
             steps: vec![],
         }
     }
+
+    pub fn has_moved(&self) -> bool {
+        self.steps.len() != 0
+    }
 }
 
 impl MovementEngine {

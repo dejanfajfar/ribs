@@ -35,6 +35,7 @@ pub struct BattleRoundState {
 pub struct BattleResult {
     combatants: Vec<Combatant>,
     map: Map,
+    actions: Vec<BattleAction>,
 }
 
 #[derive(Debug, Clone)]
@@ -54,7 +55,7 @@ pub struct CombatantTurnResult {
 
 impl BattleEngine {
     // the maximal number of rounds to be played
-    pub const MAX_ROUND_NUM: u32 = 1000;
+    pub const MAX_ROUND_NUM: u32 = 100;
 
     pub const MAX_COMBATANT_MOVE: usize = 3;
 
@@ -106,7 +107,8 @@ impl BattleEngine {
     fn analyze_results(&self, state: BattleRoundState) -> BattleResult {
         BattleResult { 
             combatants: state.combatants.to_vec(),
-            map: state.map.clone()
+            map: state.map.clone(),
+            actions: state.actions.to_vec()
          }
     }
 }
@@ -121,6 +123,10 @@ impl BattleRound {
 
     pub fn do_battle(&mut self) -> Result<BattleRoundState, Error> {
         for combatant in self.state.combatants.clone() {
+            if !combatant.is_alive() {
+                continue;
+            }
+
             let active_combatant = combatant;
             let opponents = self
                 .state
@@ -131,7 +137,7 @@ impl BattleRound {
                 .collect();
 
             let combatant_turn: CombatantTurnResult =
-                CombatantTurn::new(active_combatant, opponents, self.state.map.clone()).execute()?;
+                CombatantTurn::new(active_combatant, opponents, self.state.map.clone(), self.state.actions.to_vec()).execute()?;
 
             self.state = BattleRoundState::from(combatant_turn);
         }
@@ -164,12 +170,12 @@ impl From<&mut CombatantTurn> for CombatantTurnResult {
 }
 
 impl CombatantTurn {
-    pub fn new(active: Combatant, opponents: Vec<Combatant>, map: Map) -> Self {
+    pub fn new(active: Combatant, opponents: Vec<Combatant>, map: Map, actions: Vec<BattleAction>) -> Self {
         Self {
             active_combatant: active,
             opponents: opponents,
             map: map,
-            actions: vec![],
+            actions: actions,
         }
     }
 
@@ -192,11 +198,13 @@ impl CombatantTurn {
                 )
                 .do_move();
 
-                self.actions.push(BattleAction::Move(movement.clone()));
+                if movement.has_moved() {
+                    self.actions.push(BattleAction::Move(self.active_combatant.name.clone(), movement.clone()));
 
-                // update the active combatants position on the map
-                let map_update = self.map.move_to(active_position, movement.last_position)?;
-
+                    // update the active combatants position on the map
+                    let map_update = self.map.move_to(active_position, movement.last_position)?;
+                }
+                
                 // Determine if any opponent is in range
                 let mut potential_targets: Vec<String> =
                     self.map.get_occupied_neighbors(movement.last_position);
@@ -226,19 +234,19 @@ impl CombatantTurn {
     }
 
     fn attack(&mut self, opponent_id: String) {
-        let cloned = self.opponents.clone();
+        let cloned = self.opponents.to_vec();
         self.opponents.clear();
 
         for mut opponent in cloned {
             if opponent.name == opponent_id {
+                opponent.apply_damage(self.active_combatant.dmg);
+
                 // Add a protocol of who is attacking who and for how much
                 self.actions.push(BattleAction::Attack(BattleAttackAction {
                     assailant: self.active_combatant.clone(),
                     victim: opponent.clone(),
                     damage: self.active_combatant.dmg,
                 }));
-
-                opponent.apply_damage(self.active_combatant.dmg)
             }
 
             self.opponents.push(opponent);
