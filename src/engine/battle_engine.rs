@@ -1,5 +1,4 @@
 use rand::seq::SliceRandom;
-use rocket::http::ext::IntoCollection;
 
 use crate::types::point::Point;
 
@@ -29,6 +28,7 @@ pub struct BattleRound {
 pub struct BattleRoundState {
     combatants: Vec<Combatant>,
     map: Map,
+    actions: Vec<BattleAction>
 }
 
 #[derive(Debug, Clone)]
@@ -91,6 +91,7 @@ impl BattleEngine {
                 current_battle_round_state = Some(BattleRoundState {
                     combatants: self.combatants.to_vec(),
                     map: self.map.clone(),
+                    actions: vec![]
                 });
             }
 
@@ -146,6 +147,7 @@ impl From<CombatantTurnResult> for BattleRoundState {
         BattleRoundState {
             combatants: all_combatants,
             map: value.map.clone(),
+            actions: value.actions.to_vec()
         }
     }
 }
