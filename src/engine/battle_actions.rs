@@ -2,8 +2,8 @@ use super::{movement::MovementResult, combatant::Combatant};
 
 #[derive(Debug, Clone)]
 pub enum BattleAction{
-    Move(String, MovementResult),
-    Attack(BattleAttackAction)
+    Move(u32,String, MovementResult),
+    Attack(u32, BattleAttackAction)
 }
 
 #[derive(Debug, Clone)]

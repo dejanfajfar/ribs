@@ -1,4 +1,5 @@
-
+/// Represents a combatant in the battle.
+/// No alliances are represented and not positional data on the map is kept by this structure
 #[derive(Clone, Debug, PartialOrd, Eq, Ord)]
 pub struct Combatant{
     pub name: String,
@@ -7,10 +8,12 @@ pub struct Combatant{
 }
 
 impl Combatant {
+    /// Determines if the combatant can still partake in the battle
     pub fn is_alive(&self) -> bool {
         self.hp != u16::MIN
     }
 
+    /// Applies the given damage to the current combatant
     pub fn apply_damage(&mut self, damage: u16) {
         let sub_result = self.hp.overflowing_sub(damage);
 

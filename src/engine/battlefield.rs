@@ -1,15 +1,5 @@
-use std::collections::HashMap;
 
-use crate::{
-    storage::{
-        battlefields::BattleFieldRecord,
-        combatants::CombatantRecord,
-        Record,
-    },
-    types::point::Point, api::combatant::CombatantContract,
-};
-
-use super::{err::Error, combatant::Combatant};
+use super::combatant::Combatant;
 
 #[derive(Debug)]
 pub struct BattlefieldData {
