@@ -13,7 +13,6 @@ use super::{
 
 pub struct BattleEngine {
     map: Map,
-    rounds: Vec<BattleRound>,
     combatants: Vec<Combatant>,
     round_counter: u32,
 }
@@ -77,7 +76,6 @@ impl BattleEngine {
                 battlefield_data.battlefield_width,
                 battlefield_data.battlefield_height,
             ),
-            rounds: vec![],
             combatants: battlefield_data.combatants.to_vec(),
             round_counter: u32::MIN,
         };
@@ -218,7 +216,7 @@ impl CombatantTurn {
                     ));
 
                     // update the active combatants position on the map
-                    let map_update = self.map.move_to(active_position, movement.last_position)?;
+                    self.map.move_to(active_position, movement.last_position)?;
                 }
 
                 // Determine if any opponent is in range
@@ -309,7 +307,7 @@ mod tests {
 
         let foo = r.actions.iter().any(|a| match a {
             BattleAction::Move(_, _, _) => false,
-            BattleAction::Attack(r, attack) => attack.victim.hp == 0,
+            BattleAction::Attack(_r, attack) => attack.victim.hp == 0,
         });
 
         assert!(foo);

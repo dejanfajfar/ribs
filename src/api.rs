@@ -30,7 +30,6 @@ impl From<Error> for ApiResponse {
             Error::UserAlreadyOnMap => todo!(),
             Error::LocationOccupied(_) => todo!(),
             Error::DestinationOutOfBounds(_, _) => todo!(),
-            Error::MapIdUnknown(_) => todo!(),
             Error::MapLocationEmpty(_) => todo!(),
             Error::NoOpponentsPresent => todo!(),
         }

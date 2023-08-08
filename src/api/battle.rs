@@ -1,20 +1,10 @@
-use rocket::{
-    http::Status,
-    serde::json::{self, Json},
-    State,
-};
+use rocket::{http::Status, serde::json::Json};
 use serde::{Deserialize, Serialize};
-use surrealdb::{engine::remote::ws::Client, Surreal};
 
 use crate::{
     engine::{
-        battle_actions::BattleAction,
-        battle_engine::BattleEngine,
-        battle_result::BattleResult,
-        battlefield::BattlefieldData,
-        combatant::Combatant,
-        err::{self, Error},
-        map::Map,
+        battle_actions::BattleAction, battle_engine::BattleEngine, battle_result::BattleResult,
+        battlefield::BattlefieldData, combatant::Combatant, map::Map,
     },
     types::point::Point,
 };
@@ -30,7 +20,7 @@ impl TryFrom<Json<CreateBattleContract>> for BattlefieldData {
     type Error = crate::engine::err::Error;
 
     fn try_from(value: Json<CreateBattleContract>) -> Result<Self, Self::Error> {
-        let mut battlefield = BattlefieldData {
+        let battlefield = BattlefieldData {
             battlefield_height: value.battlefield.height,
             battlefield_width: value.battlefield.width,
             combatants: value
@@ -103,7 +93,7 @@ pub struct BattleActionAttackContract {
     attacker: String,
     attacked: String,
     dmg: u16,
-    remaining_hp: u16
+    remaining_hp: u16,
 }
 
 impl From<Point> for PointContract {
@@ -190,7 +180,7 @@ impl From<&BattleAction> for BattleActionContract {
                     attacker: action.assailant.name.clone(),
                     attacked: action.victim.name.clone(),
                     dmg: action.assailant.dmg,
-                    remaining_hp: action.victim.hp
+                    remaining_hp: action.victim.hp,
                 })
             }
         }
@@ -198,10 +188,7 @@ impl From<&BattleAction> for BattleActionContract {
 }
 
 #[post("/", format = "json", data = "<post_data>")]
-pub async fn start_new_battle(
-    post_data: Json<CreateBattleContract>,
-    db: &State<Surreal<Client>>,
-) -> ApiResponse {
+pub async fn start_new_battle(post_data: Json<CreateBattleContract>) -> ApiResponse {
     let battlefield = BattlefieldData::try_from(post_data);
 
     match battlefield {
