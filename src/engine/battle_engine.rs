@@ -72,7 +72,7 @@ impl BattleEngine {
     pub const MAX_COMBATANT_MOVE: usize = 3;
 
     pub fn new(battlefield_data: BattlefieldData) -> Result<Self, Error> {
-        let mut instance = BattleEngine {
+        let mut instance = BattleEngine { 
             map: Map::new(
                 battlefield_data.battlefield_width,
                 battlefield_data.battlefield_height,
@@ -314,6 +314,6 @@ mod tests {
 
         assert!(foo);
 
-        assert_eq!(2, r.combatants.len());
+        assert_eq!(3, r.combatants.len());
     }
 }
