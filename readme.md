@@ -58,12 +58,13 @@ The _API_ is exposed on port 7777.
 # Usefull links
 
 https://doc.rust-lang.org/beta/style-guide/index.html
+https://texteditor.com/ascii-art/
 
 
 # ToDo:
 
 - [ ] Unit tests
 - [ ] Swagger for the api
-- [ ] Simplified game engine
-- [ ] Combatant traversal
+- [X] Simplified game engine
+- [X] Combatant traversal
 - [ ] Combatant attack 
