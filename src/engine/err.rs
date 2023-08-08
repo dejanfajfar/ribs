@@ -5,7 +5,6 @@ pub enum Error {
     UserAlreadyOnMap,
     LocationOccupied(Point),
     DestinationOutOfBounds(Point, Point),
-    MapIdUnknown(String),
     MapLocationEmpty(Point),
     NoOpponentsPresent
 }
