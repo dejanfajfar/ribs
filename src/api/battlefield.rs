@@ -1,38 +1,90 @@
-use crate::engine::{
-    armor::Armor,
-    battlefield::BattleField,
-    player::Player,
-    skills::SkillsFactory,
-    weapons::{blades::BladeFactory, guns::GunFactory, Weapon},
+use rocket::{serde::json::Json, State};
+use serde::{Deserialize, Serialize};
+use surrealdb::{engine::remote::ws::Client, Surreal};
+
+use crate::{
+    api::ApiResponse,
+    storage::{battlefields::*, Record, combatants::CombatantEntity},
 };
 
+use super::{CrudApiScaffold, combatant::CombatantContract};
+
+#[derive(Serialize, Deserialize)]
+pub struct BattleFieldContract {
+    pub height: u8,
+    pub width: u8,
+    pub id: Option<String>,
+    pub combatants: Vec<CombatantContract>
+}
+
+impl From<Json<BattleFieldContract>> for BattleFieldEntity {
+    fn from(value: Json<BattleFieldContract>) -> Self {
+        BattleFieldEntity {
+            height: value.height,
+            width: value.width,
+            combatants: value.combatants.iter().map(|c| CombatantEntity::from(Json(c.clone()))).collect()
+        }
+    }
+}
+
+impl From<&BattleFieldRecord> for BattleFieldContract {
+    fn from(value: &BattleFieldRecord) -> Self {
+        BattleFieldContract {
+            height: value.height,
+            width: value.width,
+            id: Some(value.get_id()),
+            combatants: value.combatants.iter().map(|c| CombatantContract::from(c)).collect()
+        }
+    }
+}
+
 #[get("/")]
-pub fn get_battlefield() -> String {
-    let mut battlefield: BattleField = BattleField::default();
+pub async fn get_all(db: &State<Surreal<Client>>) -> Json<Vec<BattleFieldContract>> {
+    let all_battlefields: Vec<BattleFieldRecord> =
+        CrudApiScaffold::get_all::<BattleFieldEntity, BattleFieldRecord>(db).await;
 
-    let gun_factory: GunFactory = GunFactory {};
-    let blade_factory: BladeFactory = BladeFactory {};
-    let skills_factory: SkillsFactory = SkillsFactory {};
+    return Json(Vec::from_iter(all_battlefields.iter().map(
+        |record: &BattleFieldRecord| BattleFieldContract::from(record),
+    )));
+}
 
-    let player1 = Player::new("Bob".to_owned(), skills_factory.random(), 400)
-        .add_weapon(Weapon::Gun(gun_factory.m_10af_lexington()));
+#[post("/", format = "json", data = "<post_data>")]
+pub async fn create_new(
+    post_data: Json<BattleFieldContract>,
+    db: &State<Surreal<Client>>,
+) -> ApiResponse {
+    let entity: BattleFieldEntity = BattleFieldEntity::from(post_data);
+    CrudApiScaffold::create_new(db, entity, |record: BattleFieldRecord| {
+        BattleFieldContract::from(&record)
+    })
+    .await
+}
 
-    let player3 = Player::new("Carl".to_owned(), skills_factory.random(), 400)
-        .add_weapon(Weapon::Gun(gun_factory.m_10af_lexington()));
+#[put("/<id>", format = "json", data = "<post_data>")]
+pub async fn update(
+    id: &str,
+    post_data: Json<BattleFieldContract>,
+    db: &State<Surreal<Client>>,
+) -> ApiResponse {
+    let entity: BattleFieldEntity = BattleFieldEntity::from(post_data);
+    CrudApiScaffold::update(db, id, entity, |record: BattleFieldRecord| {
+        BattleFieldContract::from(&record)
+    })
+    .await
+}
 
-    let player2 = Player::new("Dave".to_owned(), skills_factory.ninja(), 400)
-        .add_weapon(Weapon::Blade(blade_factory.katana()))
-        .add_armor(Armor::new(10, false));
+#[get("/<id>")]
+pub async fn get_by_id(id: &str, db: &State<Surreal<Client>>) -> ApiResponse {
+    CrudApiScaffold::get_by_id(db, id, |record: BattleFieldRecord| {
+        BattleFieldContract::from(&record)
+    })
+    .await
+}
 
-    battlefield.add_player(player1);
-    battlefield.add_player(player2);
-    battlefield.add_player(player3);
-
-    let battlefield_json = serde_json::to_string_pretty(&battlefield).unwrap();
-
-    let results = battlefield.start();
-
-    let results_json = serde_json::to_string_pretty(&results).unwrap();
-
-    return results_json;
+#[delete("/<id>")]
+pub async fn delete(id: &str, db: &State<Surreal<Client>>) -> ApiResponse {
+    CrudApiScaffold::delete(db, id, |record: BattleFieldRecord| {
+        BattleFieldContract::from(&record)
+    })
+    .await
 }

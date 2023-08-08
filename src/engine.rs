@@ -1,6 +1,8 @@
-pub mod armor;
 pub mod battlefield;
-pub mod damage;
-pub mod player;
-pub mod skills;
-pub mod weapons;
+pub mod movement;
+pub mod err;
+pub mod battle_engine;
+pub mod combatant;
+pub mod map;
+pub mod battle_actions;
+pub mod battle_result;
