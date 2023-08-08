@@ -22,12 +22,4 @@ impl BattleResult {
             round_number: state.round_number
         }
     }
-
-    pub fn survivors(&self) -> Vec<Combatant> {
-        self.combatants.iter().filter(|c| c.is_alive()).cloned().collect()
-    }
-
-    pub fn rounds_played(&self) -> u32 {
-        self.round_number
-    }
 }

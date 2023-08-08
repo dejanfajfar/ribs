@@ -117,10 +117,6 @@ mod tests {
     use super::*;
     use approx::assert_relative_eq;
 
-    fn init() {
-        let _ = env_logger::builder().is_test(true).try_init();
-    }
-
     #[test]
     fn distance() {
         let p1: Point = Point { x: 1, y: 1 };

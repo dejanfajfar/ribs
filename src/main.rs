@@ -6,8 +6,8 @@ use storage::middleware::DbMiddleware;
 #[macro_use]
 extern crate rocket;
 
-#[macro_use]
-extern crate log;
+//#[macro_use]
+//extern crate log;
 
 mod api;
 mod engine;
@@ -16,7 +16,7 @@ mod types;
 
 #[launch]
 fn rocket() -> _ {
-    env_logger::init();
+    //env_logger::init();
     rocket::build()
         .mount("/", routes![api::index])
         .mount(

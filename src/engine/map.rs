@@ -47,16 +47,6 @@ impl Map {
         Ok(true)
     }
 
-    pub fn place(&mut self, id: String, location: Point) -> Result<bool, Error> {
-        if !self.is_occupied(location) {
-            return Err(Error::LocationOccupied(location));
-        }
-
-        self.pois.insert(location, id);
-
-        Ok(true)
-    }
-
     pub fn move_to(&mut self, origin: Point, goal: Point) -> Result<bool, Error> {
         let pois_clone = self.pois.clone();
         let origin_id: Option<&String> = pois_clone.get(&origin);
