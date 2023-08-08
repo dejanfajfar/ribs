@@ -9,3 +9,16 @@
 
 ```                                                                
 
+# Environment variables
+
+The following 
+
+## db_address
+
+## db_username
+
+## db_password
+
+## db_namespace
+
+## db_name

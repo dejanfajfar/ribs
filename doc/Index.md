@@ -1,3 +1,14 @@
+```
+ ▄▄▄▄▄▄        ▄▄▄      ▄▄▄▄▄▄▄      ▄▄▄▄▄▄▄ 
+█   ▄  █      █   █    █  ▄    █    █       █
+█  █ █ █      █   █    █ █▄█   █    █  ▄▄▄▄▄█
+█   █▄▄█▄     █   █    █       █    █ █▄▄▄▄▄ 
+█    ▄▄  █▄▄▄ █   █▄▄▄ █  ▄   █ ▄▄▄ █▄▄▄▄▄  █
+█   █  █ █   ██   █   ██ █▄█   █   █ ▄▄▄▄▄█ █
+█▄▄▄█  █▄█▄▄▄██▄▄▄█▄▄▄██▄▄▄▄▄▄▄█▄▄▄██▄▄▄▄▄▄▄█
+
+```
+
 # R.I.B.S battle system
 
 The R.I.B.S battle system is a simple version of a AFK grid based battle system used to learn and show some capabilities of the RUST language and how to get it running!
