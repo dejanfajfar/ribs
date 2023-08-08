@@ -20,6 +20,22 @@ impl Map {
         }
     }
 
+    pub fn get_width(&self) -> u8 {
+        self.width
+    }
+
+    pub fn get_height(&self) -> u8 {
+        self.height
+    }
+
+    pub fn get_pois(&self) -> Vec<(Point, String)> {
+        self.pois
+            .iter()
+            .clone()
+            .map(|poi| (poi.0.clone(), poi.1.clone()))
+            .collect()
+    }
+
     pub fn place_randomly(&mut self, id: String) -> Result<bool, Error> {
         let position = self.unoccupied_location();
 
@@ -63,7 +79,7 @@ impl Map {
                     return Err(Error::LocationOccupied(goal));
                 }
 
-                self.pois.remove(&origin); 
+                self.pois.remove(&origin);
                 self.pois.insert(goal, id.clone());
 
                 Ok(true)
@@ -72,14 +88,14 @@ impl Map {
         }
     }
 
-    pub fn get_occupied_neighbors(&self, location: Point) -> Vec<String>{
+    pub fn get_occupied_neighbors(&self, location: Point) -> Vec<String> {
         // if the provided location is outside of the map bounds then we return an empty array
-        if location > self.map_bounds(){
+        if location > self.map_bounds() {
             return vec![];
         }
 
         let mut occupied_neighbors = vec![];
-        
+
         for neighbor in location.neighbors(None) {
             for poi in self.pois.clone() {
                 if neighbor == poi.0 {

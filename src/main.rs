@@ -39,6 +39,7 @@ fn rocket() -> _ {
                 api::combatant::get_by_id
             ],
         )
+        .mount("/battle", routes![api::battle::start_new_battle])
         .attach(DbMiddleware)
         .configure(Config {
             port: 7777,

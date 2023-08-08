@@ -5,6 +5,7 @@ use rocket::State;
 use serde::Serialize;
 use surrealdb::{engine::remote::ws::Client, Surreal};
 
+use crate::engine::err::Error;
 use crate::storage::{Entity, GenericEntity, Record};
 
 pub mod battlefield;
@@ -20,6 +21,19 @@ pub struct ApiResponse {
 impl ApiResponse {
     pub fn empty(status: Status) -> Self {
         ApiResponse { json: String::from(""), status }
+    }
+}
+
+impl From<Error> for ApiResponse {
+    fn from(value: Error) -> Self {
+        match value {
+            Error::UserAlreadyOnMap => todo!(),
+            Error::LocationOccupied(_) => todo!(),
+            Error::DestinationOutOfBounds(_, _) => todo!(),
+            Error::MapIdUnknown(_) => todo!(),
+            Error::MapLocationEmpty(_) => todo!(),
+            Error::NoOpponentsPresent => todo!(),
+        }
     }
 }
 
