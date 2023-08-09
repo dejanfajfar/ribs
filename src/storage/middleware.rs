@@ -1,4 +1,4 @@
-use std::{env};
+use std::env;
 
 use rocket::{
     fairing::{Fairing, Info, Kind, Result},
@@ -6,7 +6,7 @@ use rocket::{
 };
 use serde::Deserialize;
 use surrealdb::{
-    engine::remote::ws::{Client, Ws},
+    engine::remote::ws::{Ws, Client},
     opt::auth::Root,
     Surreal,
 };
@@ -48,6 +48,29 @@ fn env_or_default<'a>(key: &'a str, default: &'a str) -> String {
 
 pub struct DbMiddleware;
 
+impl DbMiddleware {
+
+    /// Returns an active connection to the database
+    /// 
+    /// The connection data is retrieved from the DbConfig default value 
+    async fn connect(&self) -> Result<Surreal<Client>, surrealdb::Error> {
+        let db_config: DbConfig = DbConfig::default();
+        let db = Surreal::new::<Ws>(db_config.address.clone()).await?;
+
+        db.signin(Root {
+            password: &db_config.pass,
+            username: &db_config.user,
+        })
+        .await?;
+
+        db.use_ns(db_config.namespace)
+        .use_db(db_config.database)
+        .await?;
+
+        return Ok(db);
+    }
+}
+
 #[rocket::async_trait]
 impl Fairing for DbMiddleware {
     fn info(&self) -> Info {
@@ -57,25 +80,24 @@ impl Fairing for DbMiddleware {
         }
     }
 
+    /// Enrolls the db connection state management at application "ignite"
+    /// 
+    /// EXPLANATION:
+    /// We can do this because we are using a standing WS (WebSocket) connection to the database
+    /// Because of that we only need to open a connection at application start and then only reuse it
+    /// 
+    /// NOTE:
+    /// In the case that the connection to the database is interrupted we do not reestablish automatically!
+    /// The application has to be restarted!
     async fn on_ignite(&self, rocket: Rocket<Build>) -> Result {
-        let _figment = rocket.figment().clone();
-
-        let db_config: DbConfig = DbConfig::default();
-
-        let db: Surreal<Client> = Surreal::new::<Ws>(db_config.address).await.unwrap();
-
-        db.signin(Root {
-            password: &db_config.pass,
-            username: &db_config.user,
-        })
-        .await
-        .unwrap();
-
-        db.use_ns(db_config.namespace)
-            .use_db(db_config.database)
-            .await
-            .unwrap();
-
-        Ok(rocket.manage(db))
+        let db = self.connect().await;
+        match db {
+            Ok(db_connection) => Ok(rocket.manage(db_connection)),
+            Err(e) => panic!(
+                "Could not connect to {} with reason: {}",
+                DbConfig::default().address,
+                e.to_string()
+            ),
+        }
     }
 }
