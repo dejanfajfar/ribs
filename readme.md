@@ -43,6 +43,8 @@ There is a `Dockerfile` provided. It build the application and provides you with
 ?> docker build . -t ribs:latest
 ```
 
+More about the docker image can be found at [/doc/DockerImage.md](https://github.com/dejanfajfar/ribs/blob/main/doc/DockerImage.md)
+
 ## Docker compose 
 
 Having a docker image is great an all but if you want to run the application then you will need something more. And before you go out and install everthing I made a simple `docker-compose` file that starts everything for you.
