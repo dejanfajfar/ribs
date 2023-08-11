@@ -39,6 +39,7 @@ LABEL Maintainer="dejan@fajfar.com"
 LABEL Product="RIBS"
 
 ENV RUST_BACKTRACE=full
+ENV RUST_LOG=info
 
 WORKDIR /ribs
 
