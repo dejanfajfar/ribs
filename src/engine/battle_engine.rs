@@ -315,3 +315,41 @@ mod tests {
         assert_eq!(3, r.combatants.len());
     }
 }
+
+#[cfg(test)]
+mod combatant_turn_tests {
+    use super::*;
+
+    #[test]
+    #[allow(unused_must_use)]
+    fn do_test(){
+        let active_combattant = Combatant {
+            name: String::from("Active"),
+            dmg: 2,
+            hp: 10
+        };
+        let opponent1 = Combatant{
+            name: String::from("Opponent1"),
+            dmg: 2,
+            hp: 10
+        };
+        let opponent2 = Combatant{
+            name: String::from("Opponent2"),
+            dmg: 2,
+            hp: 10
+        };
+
+        let mut map = Map::new(10, 10);
+
+        map.place_randomly(active_combattant.name.clone());
+        map.place_randomly(opponent1.name.clone());
+        map.place_randomly(opponent2.name.clone());
+
+
+        let mut test_object: CombatantTurn = CombatantTurn::new(active_combattant, vec![opponent1, opponent2], map, vec![], 1);
+
+        let test_result = test_object.execute().unwrap();
+
+        assert_ne!(0, test_result.actions.len())
+    }
+}
