@@ -47,6 +47,9 @@ function local:Set-LogLevel {
     }
 }
 
+# Set the backtrace environment variable to see better panick dumps
+$env:RUST_BACKTRACE=1
+
 # Set the log level befor running the application
 Set-LogLevel
 
