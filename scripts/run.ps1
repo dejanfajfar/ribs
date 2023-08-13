@@ -30,12 +30,19 @@ function local:Set-LogLevel {
 
     # If the provided log level is valid then we use it
     if ($validLogLevels -contains $logLevel.ToLower()) {
-        "Set log level to $logLevel"
-        $env:RUST_LOG = $logLevel.ToLower()
+        
+        # Create a lower case log level variable to ease of use
+        $lcLogLevel = $logLevel.ToLower()
+
+        # Output the log level used to the stdout
+        Write-Host "Set log level to $lcLogLevel"
+
+        $env:RUST_LOG = "$lcLogLevel"
     }
     # If an invalid log level is given the we default to INFO
     else {
-        "$logLevel is not a valid value. Seting the log level to INFO"
+        # Output warning information for wrong log level
+        Write-Warning "$logLevel is not a valid value. Seting the log level to INFO"
         $env:RUST_LOG = 'info'
     }
 }
