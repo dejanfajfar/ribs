@@ -61,6 +61,10 @@ impl BattleRoundState {
     pub fn alive_combatants(&self) -> Vec<Combatant> {
         self.combatants.iter().filter(|c| c.is_alive()).cloned().collect::<Vec<Combatant>>()
     }
+
+    pub fn get_combatant(&self, name: &str) -> Option<&Combatant> {
+        self.combatants.iter().find(|c| c.name == name)
+    }
 }
 
 impl BattleEngine {
@@ -119,31 +123,42 @@ impl BattleRound {
         }
     }
 
-    pub fn do_battle(&mut self) -> Result<BattleRoundState, Error> {
+    pub fn do_battle(&self) -> Result<BattleRoundState, Error> {
+        let mut tmp_state = self.state.clone();
         for combatant in self.state.alive_combatants() {
 
-            let active_combatant = combatant;
-            let opponents = self
-                .state
-                .combatants
-                .iter()
-                .filter(|c| **c != active_combatant)
-                .cloned()
-                .collect();
+            let active_combatant = tmp_state.get_combatant(&combatant.name);
 
-            let combatant_turn: CombatantTurnResult = CombatantTurn::new(
-                active_combatant,
-                opponents,
-                self.state.map.clone(),
-                self.state.actions.to_vec(),
-                self.round_number,
-            )
-            .execute()?;
+            match active_combatant {
+                Some(ac) => {
 
-            self.state = BattleRoundState::from(combatant_turn);
+                    if !ac.is_alive(){
+                        continue;
+                    }
+
+                    let opponents = tmp_state
+                    .combatants
+                    .iter()
+                    .filter(|c| *c != ac)
+                    .cloned()
+                    .collect();
+    
+                let combatant_turn: CombatantTurnResult = CombatantTurn::new(
+                    ac.clone(),
+                    opponents,
+                    tmp_state.map.clone(),
+                    tmp_state.actions.to_vec(),
+                    self.round_number,
+                )
+                .execute()?;
+    
+                tmp_state = BattleRoundState::from(combatant_turn);
+                },
+                None => continue,
+            }
         }
 
-        return Ok(self.state.clone());
+        return Ok(tmp_state);
     }
 }
 
@@ -349,6 +364,50 @@ mod combatant_turn_tests {
         let mut test_object: CombatantTurn = CombatantTurn::new(active_combattant, vec![opponent1, opponent2], map, vec![], 1);
 
         let test_result = test_object.execute().unwrap();
+
+        assert_ne!(0, test_result.actions.len())
+    }
+}
+
+#[cfg(test)]
+mod battle_round_tests {
+    use super::*;
+
+    #[test]
+    #[allow(unused_must_use)]
+    fn do_test(){
+        let combatant1 = Combatant {
+            name: String::from("Combatant1"),
+            dmg: 2,
+            hp: 10
+        };
+        let combatant2 = Combatant{
+            name: String::from("Combatant2"),
+            dmg: 2,
+            hp: 10
+        };
+        let combatant3 = Combatant{
+            name: String::from("Combatant3"),
+            dmg: 2,
+            hp: 10
+        };
+
+        let mut map = Map::new(10, 10);
+
+        map.place_randomly(combatant1.name.clone());
+        map.place_randomly(combatant2.name.clone());
+        map.place_randomly(combatant3.name.clone());
+
+        let initial_state = BattleRoundState{
+            actions: vec![],
+            combatants: vec![combatant1, combatant2, combatant3],
+            map: map,
+            round_number: 1
+        };
+
+        let test_object = BattleRound::new(2, initial_state);
+
+        let test_result = test_object.do_battle().unwrap();
 
         assert_ne!(0, test_result.actions.len())
     }
