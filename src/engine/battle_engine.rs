@@ -105,7 +105,7 @@ impl BattleEngine {
             current_battle_round_state = result.clone();
         }
 
-        let battle_result = BattleResult::new(current_battle_round_state);
+        let battle_result = BattleResult::new(current_battle_round_state).analyze_results();
 
         return Ok(battle_result);
     }

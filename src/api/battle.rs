@@ -51,6 +51,7 @@ pub struct BattleResultContract {
     pub map: MapContract,
     pub actions: Vec<BattleActionContract>,
     pub round_number: u32,
+    pub winner: Option<CombatantContract>,
 }
 
 #[derive(Serialize)]
@@ -142,6 +143,7 @@ impl From<BattleResult> for BattleResultContract {
                 .iter()
                 .map(|action| BattleActionContract::from(action))
                 .collect(),
+            winner: CombatantContract::from_option(value.winner),
             round_number: value.round_number,
         }
     }
@@ -154,6 +156,15 @@ impl From<&Combatant> for CombatantContract {
             id: None,
             hp: value.hp,
             dmg: value.dmg,
+        }
+    }
+}
+
+impl CombatantContract {
+    fn from_option(value: Option<Combatant>) -> Option<Self> {
+        match value {
+            Some(_v) => Some(CombatantContract::from(&_v)),
+            None => None,
         }
     }
 }
