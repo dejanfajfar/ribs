@@ -62,13 +62,13 @@ impl MovementEngine {
             Some(d) => MovementResult {
                 goal: movement_goal,
                 start: self.current_position,
-                steps: path,
+                steps: path.to_vec(),
                 last_position: d,
             },
             None => MovementResult {
                 goal: movement_goal,
                 start: self.current_position,
-                steps: path,
+                steps: path.to_vec(),
                 last_position: self.current_position,
             },
         }
@@ -114,8 +114,26 @@ mod tests {
         }
         .do_move();
 
+        assert!(result.has_moved());
         assert_eq!(player, result.start);
         assert_eq!(enemy2, result.goal);
+    }
+
+    #[test]
+    fn find_path2(){
+        let player = Point::new(0, 6);
+        let enemy1 = Point::new(0, 7);
+        
+        let result: MovementResult = MovementEngine {
+            current_position: player,
+            enemies: vec![enemy1],
+            step_limit: None,
+        }
+        .do_move();
+
+        assert!(!result.has_moved());
+
+    assert_eq!(0, result.steps.len());
     }
 
     #[test]
@@ -152,5 +170,42 @@ mod tests {
         assert_eq!(enemy1, result.goal);
         assert_eq!(Point::new(10, 19), result.last_position);
         assert_eq!(23, result.steps.len());
+    }
+
+    #[test]
+    fn do_move_target_is_neighbor(){
+        let player = Point::new(0, 7);
+        let enemy1 = Point::new(0, 6);
+
+        let result: MovementResult = MovementEngine {
+            current_position: player,
+            enemies: vec![enemy1],
+            step_limit: Some(30),
+        }
+        .do_move();
+
+        assert!(!result.has_moved());
+        assert_eq!(player, result.start);
+        assert_eq!(enemy1, result.goal);
+        assert_eq!(player, result.last_position);
+    }
+
+    #[test]
+    fn do_move_obstacle_in_path(){
+        let player = Point::new(0, 7);
+        let enemy1 = Point::new(0, 6);
+        let enemy2 = Point::new(0, 5);
+
+        let result: MovementResult = MovementEngine {
+            current_position: player,
+            enemies: vec![enemy1, enemy2],
+            step_limit: Some(30),
+        }
+        .do_move();
+
+        assert!(!result.has_moved());
+        assert_eq!(player, result.start);
+        assert_eq!(enemy1, result.goal);
+        assert_eq!(player, result.last_position);
     }
 }

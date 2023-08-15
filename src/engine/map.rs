@@ -36,6 +36,21 @@ impl Map {
             .collect()
     }
 
+    pub fn remove_poi(&self, id: &str) -> Self {
+        let poi_location = self.position_for(id);
+
+        match poi_location {
+            Some(l) => {
+                let mut self_clone = self.clone();
+
+                self_clone.pois.remove(&l);
+
+                self_clone
+            },
+            None => self.clone(),
+        }
+    }
+
     pub fn place_randomly(&mut self, id: String) -> Result<bool, Error> {
         let position = self.unoccupied_location();
 
@@ -47,9 +62,25 @@ impl Map {
         Ok(true)
     }
 
+    #[allow(dead_code)] // Currently used in unit tests and for the future feature of manually playing the combatants
+    pub fn place(&mut self, id: String, location: Point) -> Result<bool, Error> {
+        if self.is_occupied(location) {
+            return Err(Error::DestinationOccupied(Point::new(0, 0), location));
+        }
+
+        self.pois.insert(location.clone(), id.clone());
+
+        Ok(true)
+    }
+
     pub fn move_to(&mut self, origin: Point, goal: Point) -> Result<bool, Error> {
         let pois_clone = self.pois.clone();
         let origin_id: Option<&String> = pois_clone.get(&origin);
+
+        // if the origin and goal position is the same then we have already successfully moved to the goal!
+        if origin == goal {
+            return Ok(true);
+        }
 
         match origin_id {
             Some(id) => {
@@ -66,7 +97,7 @@ impl Map {
 
                 // if the destination is occupied then we can not move to the desired location
                 if self.is_occupied(goal) {
-                    return Err(Error::LocationOccupied(goal));
+                    return Err(Error::DestinationOccupied(origin, goal));
                 }
 
                 self.pois.remove(&origin);
@@ -126,5 +157,25 @@ impl Map {
             x: self.width,
             y: self.height,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    ///
+    /// When placing a POI on empty map and then moving it to another location
+    /// the original location has to be marked as empty
+    #[test]
+    #[allow(unused_must_use)]
+    fn move_to(){
+        let mut test_object = Map::new(10, 10);
+
+        test_object.place(String::from("value"), Point::new(1, 1));
+
+        test_object.move_to(Point::new(1, 1), Point::new(2, 2));
+
+        assert!(!test_object.is_occupied(Point::new(1, 1)));
     }
 }

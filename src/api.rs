@@ -8,6 +8,8 @@ use surrealdb::{engine::remote::ws::Client, Surreal};
 use crate::engine::err::Error;
 use crate::storage::{Entity, GenericEntity, Record};
 
+use self::battle::PointContract;
+
 pub mod battlefield;
 pub mod combatant;
 pub mod battle;
@@ -16,6 +18,12 @@ pub mod battle;
 pub struct ApiResponse {
     pub json: String,
     pub status: Status,
+}
+
+#[derive(Serialize)]
+struct DestinationOccupiedContract {
+    pub origin: PointContract,
+    pub goal: PointContract
 }
 
 impl ApiResponse {
@@ -28,7 +36,15 @@ impl From<Error> for ApiResponse {
     fn from(value: Error) -> Self {
         match value {
             Error::UserAlreadyOnMap => todo!(),
-            Error::LocationOccupied(_) => todo!(),
+            Error::DestinationOccupied(origin, goal) => {
+                ApiResponse{
+                    json: serde_json::to_string(&DestinationOccupiedContract{
+                        origin: PointContract::from(origin),
+                        goal: PointContract::from(goal)
+                    }).unwrap(),
+                    status: Status::Conflict
+                }
+            },
             Error::DestinationOutOfBounds(_, _) => todo!(),
             Error::MapLocationEmpty(_) => todo!(),
             Error::NoOpponentsPresent => todo!(),
