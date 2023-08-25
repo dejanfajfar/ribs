@@ -30,7 +30,7 @@
 ## [POST] /battle/
 
 ```json
-    {
+{
 	"map": {
 		"height": 16,
 		"width": 16
@@ -52,5 +52,16 @@
             "hp": 20
 		}
 	]
+}
+```
+
+## [POST] /combatants
+
+```json
+{
+	"name": "test3",
+	"dmg": 5,
+	"hp": 400,
+	"avatar": "image.jpg"
 }
 ```
