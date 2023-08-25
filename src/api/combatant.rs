@@ -9,6 +9,7 @@ use super::{ApiResponse, CrudApiScaffold};
 pub struct CombatantContract {
     pub name: String,
     pub id: Option<String>,
+    pub avatar: Option<String>,
     pub hp: u16,
     pub dmg: u16,
 }
@@ -21,6 +22,7 @@ impl From<&CombatantRecord> for CombatantContract {
             id: Some(value.get_id()),
             hp: entity.hit_points,
             dmg: entity.damage_rating,
+            avatar: entity.avatar,
         }
     }
 }
@@ -32,6 +34,7 @@ impl From<&CombatantEntity> for CombatantContract {
             id: None,
             hp: value.hit_points,
             dmg: value.damage_rating,
+            avatar: value.avatar.clone(),
         }
     }
 }
@@ -42,6 +45,7 @@ impl From<Json<CombatantContract>> for CombatantEntity {
             name: value.name.clone(),
             damage_rating: value.dmg,
             hit_points: value.hp,
+            avatar: value.avatar.clone(),
         }
     }
 }
@@ -102,21 +106,3 @@ pub async fn update(
     })
     .await;
 }
-
-//#[post("/<id>", format = "json", data = "<combatant_post_data>")]
-//pub async fn update(
-//    id: &str,
-//    combatant_post_data: Json<CreateCombatantContract>,
-//    db: &State<Surreal<Client>>) -> ApiResponse {
-//        let updated_combatant: Result<CombatantRecord, surrealdb::Error> = CombatantEntity::update(db, id, combatant_post_data).await;//
-//        match updated_combatant{
-//            Ok(c) => ApiResponse{
-//                json: serde_json::to_string(&c).unwrap(),
-//                status: Status::Ok
-//            },
-//            Err(e) => ApiResponse {
-//                json: e.to_string(),
-//                status: Status::BadRequest,
-//            },
-//        }
-//    }

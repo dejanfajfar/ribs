@@ -10,6 +10,7 @@ pub struct CombatantEntity {
     pub name: String,
     pub damage_rating: u16,
     pub hit_points: u16,
+    pub avatar: Option<String>,
 }
 
 impl Entity for CombatantEntity {
@@ -24,6 +25,7 @@ pub struct CombatantRecord {
     pub name: String,
     pub damage_rating: u16,
     pub hit_points: u16,
+    pub avatar: Option<String>,
 }
 
 impl Record<CombatantEntity> for CombatantRecord {
@@ -36,6 +38,7 @@ impl Record<CombatantEntity> for CombatantRecord {
             name: self.name.clone(),
             damage_rating: self.damage_rating,
             hit_points: self.hit_points,
+            avatar: self.avatar.clone()
         }
     }
 }

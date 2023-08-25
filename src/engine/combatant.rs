@@ -5,6 +5,8 @@ pub struct Combatant{
     pub name: String,
     pub hp: u16,
     pub dmg: u16,
+    pub id: Option<String>,
+    pub avatar: Option<String>,
 }
 
 impl Combatant {
@@ -41,7 +43,9 @@ mod tests {
         let test_object = Combatant{
             name: "test".to_owned(),
             dmg: 2,
-            hp: 0
+            hp: 0,
+            avatar: None,
+            id: None,
         };
 
         assert!(!test_object.is_alive());
@@ -52,7 +56,9 @@ mod tests {
         let test_object = Combatant{
             name: "test".to_owned(),
             dmg: 2,
-            hp: u16::MIN
+            hp: u16::MIN,
+            avatar: None,
+            id: None,
         };
 
         assert!(!test_object.is_alive());
@@ -63,7 +69,9 @@ mod tests {
         let mut test_object = Combatant{
             name: "test".to_owned(),
             dmg: 2,
-            hp: 15
+            hp: 15,
+            avatar: None,
+            id: None,
         };
 
         test_object.apply_damage(5);
@@ -76,7 +84,9 @@ mod tests {
         let mut test_object = Combatant{
             name: "test".to_owned(),
             dmg: 2,
-            hp: 15
+            hp: 15,
+            avatar: None,
+            id: None,
         };
 
         test_object.apply_damage(15);
@@ -92,7 +102,9 @@ mod tests {
         let mut test_object = Combatant{
             name: "test".to_owned(),
             dmg: 2,
-            hp: 15
+            hp: 15,
+            avatar: None,
+            id: None,
         };
 
         test_object.apply_damage(u16::MAX);
@@ -108,7 +120,9 @@ mod tests {
         let c1 = Combatant{
             name: "test".to_owned(),
             dmg: 2,
-            hp: 15
+            hp: 15,
+            avatar: None,
+            id: None,
         };
 
         assert_eq!(c1, c1);
@@ -119,13 +133,17 @@ mod tests {
         let c1 = Combatant{
             name: "c1".to_owned(),
             dmg: 5,
-            hp: 10
+            hp: 10,
+            avatar: None,
+            id: None,
         };
 
         let c2 = Combatant{
             name: "c1".to_owned(),
             dmg: 2,
-            hp: 20
+            hp: 20,
+            avatar: None,
+            id: None,
         };
 
         assert_eq!(c1, c2);

@@ -47,6 +47,8 @@ impl From<&CombatantContract> for Combatant {
             name: value.name.clone(),
             hp: value.hp,
             dmg: value.dmg,
+            avatar: value.avatar.clone(),
+            id: value.id.clone()
         }
     }
 }
@@ -159,9 +161,10 @@ impl From<&Combatant> for CombatantContract {
     fn from(value: &Combatant) -> Self {
         Self {
             name: value.name.clone(),
-            id: None,
+            id: value.id.clone(),
             hp: value.hp,
             dmg: value.dmg,
+            avatar: value.avatar.clone()
         }
     }
 }
