@@ -9,11 +9,18 @@ use crate::{
     types::point::Point,
 };
 
-use super::{battlefield::BattleFieldContract, combatant::CombatantContract, ApiResponse};
+use super::{combatant::CombatantContract, ApiResponse};
 
 #[derive(Serialize, Deserialize)]
 pub struct CreateBattleContract {
-    battlefield: BattleFieldContract,
+    map: BattleBapContract,
+    combatants: Vec<CombatantContract>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct BattleBapContract {
+    pub height: u8,
+    pub width: u8,
 }
 
 impl TryFrom<Json<CreateBattleContract>> for BattlefieldData {
@@ -21,10 +28,9 @@ impl TryFrom<Json<CreateBattleContract>> for BattlefieldData {
 
     fn try_from(value: Json<CreateBattleContract>) -> Result<Self, Self::Error> {
         let battlefield = BattlefieldData {
-            battlefield_height: value.battlefield.height,
-            battlefield_width: value.battlefield.width,
+            battlefield_height: value.map.height,
+            battlefield_width: value.map.width,
             combatants: value
-                .battlefield
                 .combatants
                 .iter()
                 .map(|c| Combatant::from(c))
